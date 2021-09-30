@@ -1,14 +1,16 @@
-function isDigit(char) {
+import { Tokens } from './types';
+
+function isDigit(char: string) {
   const charCode = char.charCodeAt(0);
   return '0'.charCodeAt(0) <= charCode && charCode <= '9'.charCodeAt(0);
 }
 
-function isIdentChar(char) {
+function isIdentChar(char: string) {
   const charCode = char.charCodeAt(0);
   return 'a'.charCodeAt(0) <= charCode && charCode <= 'z'.charCodeAt(0);
 }
 
-function countDigits(source) {
+function countDigits(source: string) {
   let readPosition = 0;
   while (readPosition < source.length) {
     if (!isDigit(source[readPosition])) {
@@ -19,7 +21,7 @@ function countDigits(source) {
   return readPosition;
 }
 
-function countIdentChars(source) {
+function countIdentChars(source: string) {
   let readPosition = 0;
   while (readPosition < source.length) {
     if (!isIdentChar(source[readPosition])) {
@@ -30,8 +32,8 @@ function countIdentChars(source) {
   return readPosition;
 }
 
-module.exports.lexicalAnalyse = function (source) {
-  const tokens = [];
+module.exports.lexicalAnalyse = function (source: string): Tokens {
+  const tokens: Tokens = [];
   let readPosition = 0;
   while (readPosition < source.length) {
     switch (source[readPosition]) {
@@ -117,7 +119,7 @@ module.exports.lexicalAnalyse = function (source) {
             default:
               tokens.push({
                 type: 'Ident',
-                value: name,
+                name: name,
               });
           }
           readPosition += identCharsCount;
