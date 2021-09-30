@@ -1,5 +1,6 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
-
 
 // ******************************   Token   *************************************************************** {{{
 type Parens = 'LParen' | 'RParen'
@@ -25,8 +26,7 @@ type Token = SymbolToken | UnknownCharacterToken | IdentToken | IntToken | Keywo
 export type Tokens = Token[]
 // ********************************************************************************************************/ }}}
 
-
-// *****************************　　Expression　　**********************************************************/ {{{
+// *****************************  Expression  **********************************************************/ {{{
 type IntLiteral = { type: 'IntLiteral', value: number }
 type BoolLiteral = { type: 'BoolLiteral', value: boolean }
 type NullLiteral = { type: 'NullLiteral' }
@@ -98,7 +98,6 @@ export type ParseAddSubExpression = (tokens: Tokens) => Expression | InvalidExpr
 
 export type ParseExpression = (tokens: Tokens) => Expression | InvalidExpression
 // *****************************************************************************************************/ }}}
-
 
 // *******************************    Statement & Assignment    ****************************************/ {{{
 type NullStatement = {statements: null}
