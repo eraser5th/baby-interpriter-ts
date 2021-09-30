@@ -41,30 +41,15 @@ type FuncCall = {
     name: string,
     arguments: Expression[]
 }
-type Add = {
-    type: 'Add',
-    left: Expression,
-    right: Expression
+type InfixOperator = 'Sub' | 'Add' | 'Mul' | 'Div'
+type AddSubMulDiv = {
+    type: InfixOperator,
+    left: Expression | AddSubMulDiv | FuncCall | Literal | Variable,
+    right: Expression | AddSubMulDiv | FuncCall | Literal | Variable
 }
-type Sub = {
-    type: 'Sub'
-    left: Expression,
-    right: Expression
-}
-type Mul = {
-    type: 'Mul',
-    left: Expression,
-    right: Expression
-}
-type Div = {
-    type: 'Div',
-    left: Expression,
-    right: Expression
-}
-type InfixOperator = Sub | Add | Mul | Div
 
 export type Expression = {
-    expression: Expression | InfixOperator | FuncCall | Literal | Variable
+    expression: Expression | AddSubMulDiv | FuncCall | Literal | Variable
     parsedTokensCount: number
 }
 

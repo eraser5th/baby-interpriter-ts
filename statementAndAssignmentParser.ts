@@ -1,19 +1,11 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-use-before-define */
 
+import parseExpression from './expressionParser';
 import {
-  // Expression
-  ParseLiteral,
-  ParseValue,
-  ParseParenthesisExpression,
-  ParseFunctionCallExpression,
-  ParseMulDivExpression,
-  ParseAddSubExpression,
-  ParseExpression,
   // Statement & Assignment
   ParseBlock,
   ParseAssignment,
-  ParseCommaSeparatedExpressions,
   ParseCommaSeparatedIdentifiers,
   ParseDefineFunction,
   ParseIfStatement,
@@ -22,170 +14,6 @@ import {
   InvalidExpression,
   Expression,
 } from './types';
-
-const parseLiteral: ParseLiteral = (tokens) => {
-  const head = tokens[0];
-  switch (head.type) {
-    case 'Int':
-      return {
-        expression: {
-          type: 'IntLiteral',
-          value: head.value,
-        },
-        parsedTokensCount: 1,
-      };
-    case 'Bool':
-      return {
-        expression: {
-          type: 'BoolLiteral',
-          value: head.value,
-        },
-        parsedTokensCount: 1,
-      };
-    case 'Null':
-      return {
-        expression: {
-          type: 'NullLiteral',
-        },
-        parsedTokensCount: 1,
-      };
-    default:
-      return {
-        expression: null,
-      };
-  }
-};
-
-const parseValue: ParseValue = (tokens) => {
-  const head = tokens[0];
-  if (head?.type === 'Ident') {
-    return {
-      expression: {
-        type: 'Variable',
-        name: head.name,
-      },
-      parsedTokensCount: 1,
-    };
-  }
-  return parseLiteral(tokens);
-};
-
-const parseParenthesisExpression: ParseParenthesisExpression = (tokens) => {
-  // そもそも括弧がないから処理しない
-  if (tokens[0]?.type !== 'LParen') return parseValue(tokens);
-  // 括弧の中身を式にする
-  const { expression, parsedTokensCount } = parseExpression(tokens.slice(1));
-  // 式が無効か、閉じ括弧が存在しないから処理しない
-  if (!expression || !parsedTokensCount || tokens[parsedTokensCount + 1]?.type !== 'RParen') return parseValue(tokens);
-  return {
-    expression,
-    parsedTokensCount: parsedTokensCount + 2,
-  };
-};
-
-const parseCommaSeparatedExpressions: ParseCommaSeparatedExpressions = (tokens) => {
-  const {
-    expression: firstExpression,
-    parsedTokensCount: firstParsedTokensCount,
-  } = parseExpression(tokens);
-  if (!firstExpression || !firstParsedTokensCount) {
-    return {
-      args: [],
-      parsedTokensCount: 0,
-    };
-  }
-  const args = [firstExpression];
-  let readPosition = firstParsedTokensCount;
-  while (tokens[readPosition]?.type === 'Comma') {
-    readPosition += 1;
-    const { expression, parsedTokensCount } = parseExpression(tokens.slice(readPosition));
-    if (!expression || !parsedTokensCount) {
-      return null;
-    }
-    args.push(expression);
-    readPosition += parsedTokensCount;
-  }
-  return {
-    args,
-    parsedTokensCount: readPosition,
-  };
-};
-
-function parseUnaryOperator(tokens) {
-  if (tokens[0]?.type === 'Plus' || tokens[0]?.type === 'Minus') {
-    const { expression: left, parsedTokensCount } = parseUnaryOperator(tokens.slice(1));
-    if (left === null) {
-      return { expression: null };
-    }
-    if (tokens[0].type === 'Plus') {
-      return { expression: { type: 'Mul', left }, parsedTokensCount: parsedTokensCount + 1 };
-    }
-    return {
-      type: 'UnaryMinus',
-      value: expression,
-    };
-  }
-  return parseExpression(tokens);
-}
-
-const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
-  const name = tokens[0];
-  if (name?.type !== 'Ident' || tokens[1]?.type !== 'LParen') {
-    return parseParenthesisExpression(tokens);
-  }
-  const argsAndParsedTokensCount = parseCommaSeparatedExpressions(tokens.slice(2));
-  if (argsAndParsedTokensCount === null) {
-    return parseParenthesisExpression(tokens);
-  }
-  const { args, parsedTokensCount } = argsAndParsedTokensCount;
-  if (tokens[parsedTokensCount + 2]?.type !== 'RParen') {
-    return parseParenthesisExpression(tokens);
-  }
-  return {
-    expression: {
-      type: 'FuncCall',
-      name: name.name,
-      arguments: args,
-    },
-    parsedTokensCount: parsedTokensCount + 3,
-  };
-};
-
-const parseMulDivExpression: ParseMulDivExpression = (tokens) => {
-  let { expression: left, parsedTokensCount: readPosition } = parseFunctionCallExpression(tokens);
-  if (!left || !readPosition) return { expression: left, parsedTokensCount: readPosition };
-  while (tokens[readPosition]?.type === 'Asterisk') {
-    const {
-      expression: right,
-      parsedTokensCount: rightTokensCount,
-    } = parseFunctionCallExpression(tokens.slice(readPosition + 1));
-    if (!right || !rightTokensCount) {
-      return { expression: null };
-    }
-    left = { type: 'Mul', left, right };
-    readPosition += rightTokensCount + 1;
-  }
-  return { expression: left, parsedTokensCount: readPosition };
-};
-
-const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
-  let { expression: left, parsedTokensCount: readPosition } = parseMulDivExpression(tokens);
-  if (!left || !readPosition) return { expression: left, parsedTokensCount: readPosition };
-  while (tokens[readPosition]?.type === 'Plus') {
-    const {
-      expression: right,
-      parsedTokensCount: rightTokensCount,
-    } = parseFunctionCallExpression(tokens.slice(readPosition + 1));
-    if (!right || !rightTokensCount) {
-      return { expression: null };
-    }
-    left = { type: 'Add', left, right };
-    readPosition += rightTokensCount + 1;
-  }
-  return { expression: left, parsedTokensCount: readPosition };
-};
-
-const parseExpression: ParseExpression = (tokens) => parseAddSubExpression(tokens);
 
 const parseBlock: ParseBlock = (tokens) => {
   if (tokens[0]?.type !== 'LBrace') {
@@ -223,7 +51,7 @@ const parseIfStatement: ParseIfStatement = (tokens) => {
   } = parseExpression(tokens.slice(2));
   if (
     !condition
-    || tokens[parsedExpressionTokensCount + 2]?.type !== 'RParen') {
+      || tokens[parsedExpressionTokensCount + 2]?.type !== 'RParen') {
     return { ifStatement: null };
   }
   const {
