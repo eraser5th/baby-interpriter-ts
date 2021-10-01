@@ -4,11 +4,11 @@
 import {
   Expression, InvalidExpression, AddSubMulDiv, FuncCall, Literal, Variable,
 } from './expressionTypes';
-import { Tokens } from './tokenTypes';
+import { Token, Tokens } from './tokenTypes';
 
 type InvalidStatements = {
     statements: null,
-    parsedTokensCount: number
+    parsedTokensCount: undefined
 }
 
 export type ParseBlock = (tokens: Tokens) => {
@@ -18,7 +18,7 @@ export type ParseBlock = (tokens: Tokens) => {
 
 type IfStatement = {
     type: 'If',
-    condition: Expression | AddSubMulDiv | FuncCall | Literal | Variable,
+    condition: Expression,
     statements: (Statement)[]
 }
 
@@ -42,10 +42,7 @@ export type ParseAssignment = (tokens: Tokens) => {
     parsedTokensCount: number,
 } | InvalidAssignment
 
-export type ParseStatement = (tokens: Tokens) => {
-    statement: Expression | Assignment | IfStatement | AddSubMulDiv | FuncCall | Literal | Variable
-    parsedTokensCount: number,
-} | InvalidStatement
+export type ParseStatement = (tokens: Tokens) => StatementWithCount | InvalidStatement
 
 export type ParseCommaSeparatedIdentifiers = (tokens: Tokens) => {
     names: [],
@@ -55,8 +52,10 @@ export type ParseCommaSeparatedIdentifiers = (tokens: Tokens) => {
     parsedTokensCount: number,
 }
 
-export type Statement = {
-    statement: IfStatement | Assignment | Expression | AddSubMulDiv | FuncCall | Literal | Variable,
+export type Statement = IfStatement | Assignment | Expression
+
+export type StatementWithCount = {
+    statement: Statement,
     parsedTokensCount: number
 }
 
@@ -72,21 +71,21 @@ type DefineFunction = {
     statements: Statement[]
 }
 
-type NullDefine = { define: null }
+type InvalidDefineFunction = { defineFunction: null, parsedTokensCount: undefined }
 
 export type ParseDefineFunction = (tokens: Tokens) => {
     defineFunction: DefineFunction,
     parsedTokensCount: number,
-} | NullDefine
+} | InvalidDefineFunction
 
 type Source = {
     type: 'Source';
-    statements: Statement[];
+    partsOfSource: (Statement | DefineFunction)[];
 }
 type SyntaxError = {
     type: 'SyntaxError',
     message: string,
-    headToken: string,
+    headToken: Token,
 }
 
 export type ParseSource = (tokens: Tokens) => Source | SyntaxError

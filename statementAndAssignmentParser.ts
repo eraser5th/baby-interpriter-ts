@@ -58,6 +58,17 @@ class InvalidAssignment {
   }
 }
 
+class InvalidDefineFunction {
+  defineFunction: null
+
+  parsedTokensCount: undefined
+
+  constructor() {
+    this.defineFunction = null;
+    this.parsedTokensCount = undefined;
+  }
+}
+
 const parseBlock: ParseBlock = (tokens) => {
   // Blockでは無いので無効な文配列を返す
   if (tokens[0]?.type !== 'LBrace') return new InvalidStatements();
@@ -115,9 +126,7 @@ const parseIfStatement: ParseIfStatement = (tokens) => {
 };
 
 const parseAssignment: ParseAssignment = (tokens) => {
-  if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'Equal') {
-    return new InvalidAssignment();
-  }
+  if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'Equal') return new InvalidAssignment();
   const { expression, parsedTokensCount } = parseExpression(tokens.slice(2));
   if (!expression || !parsedTokensCount) return new InvalidAssignment();
   return {
@@ -184,7 +193,7 @@ const parseCommaSeparatedIdentifiers: ParseCommaSeparatedIdentifiers = (tokens) 
 
 const parseDefineFunction: ParseDefineFunction = (tokens) => {
   if (tokens[0]?.type !== 'Def' || tokens[1]?.type !== 'Ident' || tokens[2]?.type !== 'LParen') {
-    return { define: null };
+    return new InvalidDefineFunction();
   }
   const { name } = tokens[1];
   const {
@@ -192,14 +201,14 @@ const parseDefineFunction: ParseDefineFunction = (tokens) => {
     parsedTokensCount: parsedArgumentTokensCount,
   } = parseCommaSeparatedIdentifiers(tokens.slice(3));
   if (tokens[parsedArgumentTokensCount + 3]?.type !== 'RParen') {
-    return { define: null };
+    return new InvalidDefineFunction();
   }
   const {
     statements,
     parsedTokensCount: parsedBlockTokensCount,
   } = parseBlock(tokens.slice(parsedArgumentTokensCount + 4));
-  if (!statements) {
-    return { define: null };
+  if (!statements || !parsedBlockTokensCount) {
+    return new InvalidDefineFunction();
   }
   return {
     defineFunction: {
@@ -213,15 +222,15 @@ const parseDefineFunction: ParseDefineFunction = (tokens) => {
 };
 
 const parseSource: ParseSource = (tokens) => {
-  const statements = [];
+  const partsOfSource = [];
   let readPosition = 0;
   while (readPosition < tokens.length) {
     const {
       statement: stmt,
       parsedTokensCount: parsedExpressionTokensCount,
     } = parseStatement(tokens.slice(readPosition));
-    if (stmt) {
-      statements.push(stmt);
+    if (stmt && parsedExpressionTokensCount) {
+      partsOfSource.push(stmt);
       readPosition += parsedExpressionTokensCount;
       continue;
     }
@@ -229,8 +238,8 @@ const parseSource: ParseSource = (tokens) => {
       defineFunction,
       parsedTokensCount: parsedDefineFunctionTokensCount,
     } = parseDefineFunction(tokens.slice(readPosition));
-    if (defineFunction) {
-      statements.push(defineFunction);
+    if (defineFunction && parsedDefineFunctionTokensCount) {
+      partsOfSource.push(defineFunction);
       readPosition += parsedDefineFunctionTokensCount;
       continue;
     }
@@ -242,7 +251,7 @@ const parseSource: ParseSource = (tokens) => {
   }
   return {
     type: 'Source',
-    statements,
+    partsOfSource,
   };
 };
 
