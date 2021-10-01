@@ -1,28 +1,33 @@
-const { intValue, nullValue, boolBalue } = require('./value');
+import {
+  intValue,
+  nullValue,
+} from './value';
 
-function evaluaterError(type, environment) {
-  return {
-    result: {
-      type: 'EvaluatorError',
-      isError: true,
-      message: `無効なast\`${type}\`が渡されました`,
-    },
-    environment,
-  };
-}
+import {
+  EvaluatorError,
+  TypeError,
+  EvaluateStatements,
+} from './evaluatorTypes';
 
-function typeError(type, environment) {
-  return {
-    result: {
-      type: 'TypeError',
-      isError: true,
-      message: `無効な型\`${type}\`が渡されました`,
-    },
-    environment,
-  };
-}
+const evaluatorError: EvaluatorError = (type, environment) => ({
+  result: {
+    type: 'EvaluatorError',
+    isError: true,
+    message: `無効なast\`${type}\`が渡されました`,
+  },
+  environment,
+});
 
-function evaluateStatements(statements, environment) {
+const typeError: TypeError = (type, environment) => ({
+  result: {
+    type: 'TypeError',
+    isError: true,
+    message: `無効な型\`${type}\`が渡されました`,
+  },
+  environment,
+});
+
+const evaluateStatements: EvaluateStatements = (statements, environment) => {
   let result = nullValue;
   let env = environment;
   // forEachではreturnを使って値を返せないので書きづらく、
@@ -32,20 +37,20 @@ function evaluateStatements(statements, environment) {
     // eslint-disable-next-line no-use-before-define
     const evalResult = evaluate(stmt, env);
     if (evalResult === null) {
-      return evaluaterError(stmt, env);
+      return evaluatorError(stmt, env);
     }
     result = evalResult.result;
     env = evalResult.environment;
   }
   return { result, environment: env };
-}
+};
 
 function evaluateIfStatement(ast, initialEnvironment) {
   const { condition, statements } = ast;
   // eslint-disable-next-line no-use-before-define
   const evalResult = evaluate(condition, initialEnvironment);
   if (evalResult === null) {
-    return evaluaterError(condition, initialEnvironment);
+    return evaluatorError(condition, initialEnvironment);
   }
   const { result, environment: halfwayEnvironment } = evalResult;
   if ((result.type === 'BoolValue' && result.value === false) || result.type === 'NullValue') {
@@ -127,7 +132,7 @@ function evaluate(ast, environment) {
         environment,
       };
     default:
-      return evaluaterError(ast.type, environment);
+      return evaluatorError(ast.type, environment);
   }
 }
 
