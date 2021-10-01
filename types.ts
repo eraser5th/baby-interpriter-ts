@@ -9,7 +9,7 @@ type Braces = 'LBrace' | 'RBrace'
 type Symbols = 'Asterisk' | 'Equal' | 'Plus' | 'Minus' | Parens | Braces | 'Comma' | 'Semicolon'
 
 type SymbolToken = { type: Symbols }
-type UnknownCharacterToken = { type: 'UnknownCharacter', value: string }
+export type UnknownCharacterToken = { type: 'UnknownCharacter', value: string }
 
 type IdentToken = { type: 'Ident', name: string }
 type IntToken = { type: 'Int', value: number }
@@ -21,7 +21,7 @@ type NullToken = { type: 'Null' }
 
 type KeywordToken = BoolToken | IfToken | DefToken | NullToken
 
-type Token = SymbolToken | UnknownCharacterToken | IdentToken | IntToken | KeywordToken
+export type Token = SymbolToken | UnknownCharacterToken | IdentToken | IntToken | KeywordToken
 
 export type Tokens = Token[]
 // ********************************************************************************************************/ }}}
@@ -80,7 +80,7 @@ export type InvalidArguments = {
 export type ParseLiteral = (tokens: Tokens) => {
     expression: Literal,
     parsedTokensCount: 1
- } | InvalidExpression
+} | InvalidExpression
 
 export type ParseValue = (tokens: Tokens) => {
     expression: Literal | Variable
@@ -104,7 +104,7 @@ export type ParseExpression = (tokens: Tokens) => Expression | InvalidExpression
 // *****************************************************************************************************/ }}}
 
 // *******************************    Statement & Assignment    ****************************************/ {{{
-type NullStatement = {statements: null}
+type NullStatement = { statements: null }
 
 export type ParseBlock = (tokens: Tokens) => {
     statements: Statement[],
@@ -119,7 +119,7 @@ type IfStatement = {
 
 export type ParseIfStatement = (tokens: Tokens) => {
     ifStatement: IfStatement
-} | {ifStatement: null}
+} | { ifStatement: null }
 
 type Assignment = {
     type: 'Assignment',
@@ -127,7 +127,7 @@ type Assignment = {
     expression: Expression
 }
 
-type NullAssignment = {assignment: null}
+type NullAssignment = { assignment: null }
 
 export type ParseAssignment = (tokens: Tokens) => {
     assignment: Assignment
@@ -143,7 +143,7 @@ export type ParseStatement = (tokens: Tokens) => {
 } | {
     statement: IfStatement
     parsedTokensCount: number,
-} | { statement: null}
+} | { statement: null }
 
 export type ParseCommaSeparatedIdentifiers = (tokens: Tokens) => {
     names: [],

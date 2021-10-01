@@ -37,3 +37,27 @@ parenthesis_expr = "(" expr ")" | value
 value = ident | literal
 literal = number
 ```
+
+## 関数など
+
+### parser パート
+
+#### expressioinParser パート
+- parseLiteral
+- parseValue
+- parseParenthesisExpression
+- parseCommaSeparateExpressions
+- parseUnaryOperator
+- parseFunctionCallExpression
+- parseMulDivExpression
+- parseAddSubExpression
+- parseExpression
+
+#### statementParser パート
+- parseBlock
+- parseIfStatement
+- parseAssignment
+- parseStatement
+- parseCommaSeparatedIdentifiers
+- parseDefineFunction
+- parseSource
