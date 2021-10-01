@@ -2,12 +2,14 @@
 import { Environment } from './valueTypes';
 import { Statement } from './statementAssignmentTypes';
 
-type OwaOwary = {
-  result: {
-    type: string,
-    isError: boolean,
-    message: string
-  },
+type Owa = {
+  type: string,
+  isError: boolean,
+  message: string
+}
+
+export type OwaOwary = {
+  result: Owa,
   environment: Environment
 }
 
