@@ -1,0 +1,1 @@
+type evaluatorError = (type: string, envrionment: )
