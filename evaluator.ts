@@ -7,6 +7,7 @@ import {
   EvaluatorError,
   TypeError,
   EvaluateStatements,
+  OwaOwary,
 } from './evaluatorTypes';
 
 const evaluatorError: EvaluatorError = (type, environment) => ({
@@ -42,6 +43,10 @@ const evaluateStatements: EvaluateStatements = (statements, environment) => {
     result = evalResult.result;
     env = evalResult.environment;
   }
+  const res: OwaOwary = {
+    result,
+    environment: env,
+  };
   return { result, environment: env };
 };
 
