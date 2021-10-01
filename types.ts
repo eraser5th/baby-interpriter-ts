@@ -57,6 +57,10 @@ export type InvalidExpression = {
     expression: null,
     parsedTokensCount: undefined
 }
+export type InvalidExpressions = {
+    args: null,
+    parsedTokensCount: undefined
+}
 
 export type ParseLiteral = (tokens: Tokens) => {
     expression: Literal,
@@ -73,13 +77,13 @@ export type ParseParenthesisExpression = (tokens: Tokens) => Expression | Invali
 export type ParseCommaSeparatedExpressions = (tokens: Tokens) => {
     args: Expression[],
     parsedTokensCount: number
-} | null
+} | InvalidExpressions
 
 export type ParseFunctionCallExpression = (tokens: Tokens) => Expression | InvalidExpression
 
 export type ParseMulDivExpression = (tokens: Tokens) => Expression | InvalidExpression
 
-export type ParseAddSubExpression = (tokens: Tokens) => Expression | InvalidExpression
+export type ParseAddSubExpression = (tokens: Tokens) => Expression | InvalidExpression | AddSubMulDiv
 
 export type ParseExpression = (tokens: Tokens) => Expression | InvalidExpression
 // *****************************************************************************************************/ }}}
