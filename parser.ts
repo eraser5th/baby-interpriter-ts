@@ -2,26 +2,13 @@
 /* eslint-disable no-use-before-define */
 
 import {
-  // Expression
-  ParseLiteral,
-  ParseValue,
-  ParseParenthesisExpression,
-  ParseFunctionCallExpression,
-  ParseMulDivExpression,
-  ParseAddSubExpression,
-  ParseExpression,
-  // Statement & Assignment
-  ParseBlock,
   ParseAssignment,
-  ParseCommaSeparatedExpressions,
   ParseCommaSeparatedIdentifiers,
   ParseDefineFunction,
   ParseIfStatement,
   ParseSource,
   ParseStatement,
-  InvalidExpression,
-  Expression,
-} from './types';
+} from './statementAssignmentTypes';
 
 const parseLiteral: ParseLiteral = (tokens) => {
   const head = tokens[0];
@@ -130,6 +117,7 @@ function parseUnaryOperator(tokens) {
 
 const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
   const name = tokens[0];
+  // 関数ではないので処理しない
   if (name?.type !== 'Ident' || tokens[1]?.type !== 'LParen') {
     return parseParenthesisExpression(tokens);
   }
@@ -152,9 +140,12 @@ const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
 };
 
 const parseMulDivExpression: ParseMulDivExpression = (tokens) => {
+  // 優先度の高い、関数がないか確認
   let { expression: left, parsedTokensCount: readPosition } = parseFunctionCallExpression(tokens);
+  // 無効な式なのでinvalidExpressionで返却
   if (!left || !readPosition) return { expression: left, parsedTokensCount: readPosition };
   while (tokens[readPosition]?.type === 'Asterisk') {
+    // 演算子の右側に
     const {
       expression: right,
       parsedTokensCount: rightTokensCount,
@@ -169,6 +160,7 @@ const parseMulDivExpression: ParseMulDivExpression = (tokens) => {
 };
 
 const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
+  // 優先度の高い、乗除算がないか確認
   let { expression: left, parsedTokensCount: readPosition } = parseMulDivExpression(tokens);
   if (!left || !readPosition) return { expression: left, parsedTokensCount: readPosition };
   while (tokens[readPosition]?.type === 'Plus') {

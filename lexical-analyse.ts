@@ -1,4 +1,4 @@
-import { Tokens } from './types';
+import { Tokens } from './statementAssignmentTypes';
 
 function isDigit(char: string) {
   const charCode = char.charCodeAt(0);
@@ -119,7 +119,7 @@ module.exports.lexicalAnalyse = function (source: string): Tokens {
             default:
               tokens.push({
                 type: 'Ident',
-                name: name,
+                name,
               });
           }
           readPosition += identCharsCount;
