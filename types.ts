@@ -39,22 +39,41 @@ type Variable = {
 type FuncCall = {
     type: 'FuncCall',
     name: string,
-    arguments: Expression[]
+    arguments: (Expression | Literal | Variable | FuncCall | AddSubMulDiv)[]
 }
 type InfixOperator = 'Sub' | 'Add' | 'Mul' | 'Div'
 type AddSubMulDiv = {
     type: InfixOperator,
-    left: Expression | AddSubMulDiv | FuncCall | Literal | Variable,
-    right: Expression | AddSubMulDiv | FuncCall | Literal | Variable
+    left: Expression | Literal | Variable | FuncCall | AddSubMulDiv
+    right: Expression | Literal | Variable | FuncCall | AddSubMulDiv
 }
+/*
+type Expression = {
+    expression: Literal,
+    parsedTokensCount: 1
+} | {
+    expression: Variable,
+    parsedTokensCount: 1
+} | {
+    expression: AddSubMulDiv
+    parsedTokensCount: number
+} | {
+    expression: FuncCall
+    parsedTokensCount: number
+}
+*/
 
 export type Expression = {
-    expression: Expression | AddSubMulDiv | FuncCall | Literal | Variable
+    expression: AddSubMulDiv | FuncCall | Literal | Variable
     parsedTokensCount: number
 }
 
 export type InvalidExpression = {
     expression: null,
+    parsedTokensCount: undefined
+}
+export type InvalidArguments = {
+    args: null,
     parsedTokensCount: undefined
 }
 
@@ -71,9 +90,9 @@ export type ParseValue = (tokens: Tokens) => {
 export type ParseParenthesisExpression = (tokens: Tokens) => Expression | InvalidExpression
 
 export type ParseCommaSeparatedExpressions = (tokens: Tokens) => {
-    args: Expression[],
+    args: (Expression | AddSubMulDiv | FuncCall | Literal | Variable)[],
     parsedTokensCount: number
-} | null
+} | InvalidArguments
 
 export type ParseFunctionCallExpression = (tokens: Tokens) => Expression | InvalidExpression
 
