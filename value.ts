@@ -2,7 +2,7 @@ import {
   NullValue,
   IntValue,
   BoolValue,
-  EmptyEnvironment,
+  Environment,
 } from './valueTypes';
 
 export const nullValue: NullValue = {
@@ -22,7 +22,7 @@ export const boolBalue = (value: boolean): BoolValue => ({
   value,
 });
 
-export const emptyEnvironment: EmptyEnvironment = {
+export const emptyEnvironment: Environment = {
   variables: new Map(),
   functions: new Map(),
 };
