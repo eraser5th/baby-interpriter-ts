@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-console */
 
-import { Token } from './types';
+import { Token } from './tokenTypes';
 
 const prompts = require('prompts');
 const { emptyEnvironment } = require('./value');
@@ -20,7 +20,7 @@ async function read() {
 
 (async () => {
   let environment = emptyEnvironment;
-  const isUnknownCharacter = (token: Token) => token.type === 'UnknownCharacter';
+  const isUnknownCharacter = (token: Token): boolean => token.type === 'UnknownCharacter';
   for (;;) {
     // eslint-disable-next-line no-await-in-loop
     const tokens = lexicalAnalyse(await read());
