@@ -6,11 +6,13 @@ import parseExpression from './expressionParser';
 import {
   // Statement & Assignment
   ParseAssignment,
+  ParseBlock,
   ParseCommaSeparatedIdentifiers,
   ParseDefineFunction,
   ParseIfStatement,
   ParseSource,
   ParseStatement,
+  Statement,
 } from './statementAssignmentTypes';
 
 class InvalidStatements {
@@ -59,11 +61,11 @@ class InvalidAssignment {
 const parseBlock: ParseBlock = (tokens) => {
   // Blockでは無いので無効な文配列を返す
   if (tokens[0]?.type !== 'LBrace') return new InvalidStatements();
-  const statements = [];
+  const statements: Statement[] = [];
   let readPosition = 1;
   while (tokens[readPosition]?.type !== 'RBrace') {
     // 閉じ括弧がなかったので無効な文配列を返す
-    if (tokens[readPosition] === undefined) return new InvalidStatements();
+    if (!tokens[readPosition]) return new InvalidStatements();
     const {
       statement: stmt,
       parsedTokensCount,
@@ -93,7 +95,7 @@ const parseIfStatement: ParseIfStatement = (tokens) => {
   } = parseExpression(tokens.slice(2));
   if (!condition || !parsedExpressionTokensCount) return new InvalidIfStatement();
   if (tokens[parsedExpressionTokensCount + 2]?.type !== 'RParen') {
-    return { ifStatement: null };
+    return new InvalidIfStatement();
   }
   const {
     statements,
@@ -146,7 +148,7 @@ const parseStatement: ParseStatement = (tokens) => {
     };
   }
   const { ifStatement, parsedTokensCount: parsedIfTokensCount } = parseIfStatement(tokens);
-  if (ifStatement) {
+  if (ifStatement && parsedIfTokensCount) {
     return {
       statement: ifStatement,
       parsedTokensCount: parsedIfTokensCount,

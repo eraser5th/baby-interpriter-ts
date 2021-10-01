@@ -6,11 +6,22 @@ import {
 } from './expressionTypes';
 import { Tokens } from './tokenTypes';
 
+type InvalidStatements = {
+    statements: null,
+    parsedTokensCount: number
+}
+
+export type ParseBlock = (tokens: Tokens) => {
+    statements: Statement[],
+    parsedTokensCount: number
+} | InvalidStatements
+
 type IfStatement = {
     type: 'If',
-    condition: Expression,
+    condition: Expression | AddSubMulDiv | FuncCall | Literal | Variable,
     statements: (Statement)[]
 }
+
 type InvalidIfStatement = {ifStatement: null, parsedTokensCount: undefined}
 
 export type ParseIfStatement = (tokens: Tokens) => {
@@ -34,7 +45,7 @@ export type ParseAssignment = (tokens: Tokens) => {
 export type ParseStatement = (tokens: Tokens) => {
     statement: Expression | Assignment | IfStatement | AddSubMulDiv | FuncCall | Literal | Variable
     parsedTokensCount: number,
-} | { statement: null}
+} | InvalidStatement
 
 export type ParseCommaSeparatedIdentifiers = (tokens: Tokens) => {
     names: [],
@@ -44,9 +55,14 @@ export type ParseCommaSeparatedIdentifiers = (tokens: Tokens) => {
     parsedTokensCount: number,
 }
 
-type Statement = {
-    statement: Expression | IfStatement | Assignment,
+export type Statement = {
+    statement: IfStatement | Assignment | Expression | AddSubMulDiv | FuncCall | Literal | Variable,
     parsedTokensCount: number
+}
+
+export type InvalidStatement = {
+    statement: null
+    parsedTokensCount: undefined
 }
 
 type DefineFunction = {
@@ -65,7 +81,7 @@ export type ParseDefineFunction = (tokens: Tokens) => {
 
 type Source = {
     type: 'Source';
-    statements: Statements;
+    statements: Statement[];
 }
 type SyntaxError = {
     type: 'SyntaxError',

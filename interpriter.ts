@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-console */
 
-import { Token } from './types';
+import { Token } from './tokenTypes';
 
 const prompts = require('prompts');
 const { emptyEnvironment } = require('./value');
