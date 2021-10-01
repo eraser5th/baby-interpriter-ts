@@ -49,6 +49,10 @@ const evaluateStatements: EvaluateStatements = (statements, environment) => {
     result = evalResult.result;
     env = evalResult.environment;
   }
+  const res: OwaOwary = {
+    result,
+    environment: env,
+  };
   return { result, environment: env };
 };
 
