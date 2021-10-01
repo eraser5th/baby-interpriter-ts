@@ -10,5 +10,5 @@ type IfToken = { type: 'If' }
 type DefToken = { type: 'Def' }
 type NullToken = { type: 'Null' }
 type KeywordToken = BoolToken | IfToken | DefToken | NullToken
-type Token = SymbolToken | UnknownCharacterToken | IdentToken | IntToken | KeywordToken
+export type Token = SymbolToken | UnknownCharacterToken | IdentToken | IntToken | KeywordToken
 export type Tokens = Token[]
