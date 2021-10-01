@@ -1,65 +1,106 @@
+/* eslint-disable max-classes-per-file */
 /* eslint-disable no-continue */
 /* eslint-disable no-use-before-define */
 
 import parseExpression from './expressionParser';
 import {
   // Statement & Assignment
-  ParseBlock,
   ParseAssignment,
   ParseCommaSeparatedIdentifiers,
   ParseDefineFunction,
   ParseIfStatement,
   ParseSource,
   ParseStatement,
-  InvalidExpression,
-  Expression,
-} from './types';
+} from './statementAssignmentTypes';
+
+class InvalidStatements {
+  statements: null
+
+  parsedTokensCount: undefined
+
+  constructor() {
+    this.statements = null;
+    this.parsedTokensCount = undefined;
+  }
+}
+class InvalidStatement {
+  statement: null
+
+  parsedTokensCount: undefined
+
+  constructor() {
+    this.statement = null;
+    this.parsedTokensCount = undefined;
+  }
+}
+
+class InvalidIfStatement {
+  ifStatement: null
+
+  parsedTokensCount: undefined
+
+  constructor() {
+    this.ifStatement = null;
+    this.parsedTokensCount = undefined;
+  }
+}
+
+class InvalidAssignment {
+  assignment: null
+
+  parsedTokensCount: undefined
+
+  constructor() {
+    this.assignment = null;
+    this.parsedTokensCount = undefined;
+  }
+}
 
 const parseBlock: ParseBlock = (tokens) => {
-  if (tokens[0]?.type !== 'LBrace') {
-    return { statements: null };
-  }
+  // Blockでは無いので無効な文配列を返す
+  if (tokens[0]?.type !== 'LBrace') return new InvalidStatements();
   const statements = [];
   let readPosition = 1;
   while (tokens[readPosition]?.type !== 'RBrace') {
-    if (tokens[readPosition] === undefined) {
-      return { statements: null };
-    }
+    // 閉じ括弧がなかったので無効な文配列を返す
+    if (tokens[readPosition] === undefined) return new InvalidStatements();
     const {
       statement: stmt,
       parsedTokensCount,
     } = parseStatement(tokens.slice(readPosition));
-    if (stmt === null) {
-      return { statements: null };
-    }
+    // 無効な文なので無効な文配列を返す
+    if (!stmt || !parsedTokensCount) return new InvalidStatements();
+
     statements.push(stmt);
     readPosition += parsedTokensCount;
   }
   return {
     statements,
+    // Todo 足すべき数が間違っている
     parsedTokensCount: readPosition + 2,
   };
 };
 
 const parseIfStatement: ParseIfStatement = (tokens) => {
+  // If文でない
   if (tokens[0]?.type !== 'If' || tokens[1]?.type !== 'LParen') {
-    return { ifStatement: null };
+    return new InvalidIfStatement();
   }
+  // If文の条件式を取得
   const {
     expression: condition,
     parsedTokensCount: parsedExpressionTokensCount,
   } = parseExpression(tokens.slice(2));
-  if (
-    !condition
-      || tokens[parsedExpressionTokensCount + 2]?.type !== 'RParen') {
+  if (!condition || !parsedExpressionTokensCount) return new InvalidIfStatement();
+  if (tokens[parsedExpressionTokensCount + 2]?.type !== 'RParen') {
     return { ifStatement: null };
   }
   const {
     statements,
     parsedTokensCount: parsedBlockTokensCount,
   } = parseBlock(tokens.slice(parsedExpressionTokensCount + 3));
-  if (!statements) {
-    return { ifStatement: null };
+  if (!statements || !parsedBlockTokensCount) {
+    return new InvalidIfStatement();
   }
   return {
     ifStatement: {
@@ -73,12 +114,10 @@ const parseIfStatement: ParseIfStatement = (tokens) => {
 
 const parseAssignment: ParseAssignment = (tokens) => {
   if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'Equal') {
-    return { assignment: null };
+    return new InvalidAssignment();
   }
   const { expression, parsedTokensCount } = parseExpression(tokens.slice(2));
-  if (!expression) {
-    return { assignment: null };
-  }
+  if (!expression || !parsedTokensCount) return new InvalidAssignment();
   return {
     assignment: {
       type: 'Assignment',
@@ -91,6 +130,7 @@ const parseAssignment: ParseAssignment = (tokens) => {
 
 const parseStatement: ParseStatement = (tokens) => {
   const { expression, parsedTokensCount: parsedExpressionTokensCount } = parseExpression(tokens);
+  if (!expression || !parsedExpressionTokensCount) return new InvalidStatement();
   if (expression && tokens[parsedExpressionTokensCount]?.type === 'Semicolon') {
     return {
       statement: expression,
@@ -98,6 +138,7 @@ const parseStatement: ParseStatement = (tokens) => {
     };
   }
   const { assignment, parsedTokensCount: parsedAssignmentTokensCount } = parseAssignment(tokens);
+  if (!expression || !parsedAssignmentTokensCount) return new InvalidStatement();
   if (assignment && tokens[parsedAssignmentTokensCount]?.type === 'Semicolon') {
     return {
       statement: assignment,
@@ -111,7 +152,7 @@ const parseStatement: ParseStatement = (tokens) => {
       parsedTokensCount: parsedIfTokensCount,
     };
   }
-  return { statement: null };
+  return new InvalidStatement();
 };
 
 const parseCommaSeparatedIdentifiers: ParseCommaSeparatedIdentifiers = (tokens) => {
@@ -169,7 +210,7 @@ const parseDefineFunction: ParseDefineFunction = (tokens) => {
   };
 };
 
-const parseSource: ParseSource = function (tokens) {
+const parseSource: ParseSource = (tokens) => {
   const statements = [];
   let readPosition = 0;
   while (readPosition < tokens.length) {
