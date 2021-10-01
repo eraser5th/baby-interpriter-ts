@@ -9,7 +9,7 @@ type Braces = 'LBrace' | 'RBrace'
 type Symbols = 'Asterisk' | 'Equal' | 'Plus' | 'Minus' | Parens | Braces | 'Comma' | 'Semicolon'
 
 type SymbolToken = { type: Symbols }
-type UnknownCharacterToken = { type: 'UnknownCharacter', value: string }
+export type UnknownCharacterToken = { type: 'UnknownCharacter', value: string }
 
 type IdentToken = { type: 'Ident', name: string }
 type IntToken = { type: 'Int', value: number }
@@ -21,7 +21,7 @@ type NullToken = { type: 'Null' }
 
 type KeywordToken = BoolToken | IfToken | DefToken | NullToken
 
-type Token = SymbolToken | UnknownCharacterToken | IdentToken | IntToken | KeywordToken
+export type Token = SymbolToken | UnknownCharacterToken | IdentToken | IntToken | KeywordToken
 
 export type Tokens = Token[]
 // ********************************************************************************************************/ }}}
