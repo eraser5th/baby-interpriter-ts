@@ -7,6 +7,8 @@ import {
   EvaluatorError,
   TypeError,
   EvaluateStatements,
+  OwaOwary,
+  Owa,
 } from './evaluatorTypes';
 
 const evaluatorError: EvaluatorError = (type, environment) => ({
@@ -28,7 +30,12 @@ const typeError: TypeError = (type, environment) => ({
 });
 
 const evaluateStatements: EvaluateStatements = (statements, environment) => {
-  let result = nullValue;
+  if (statements.length === 0) return nullValue;
+  let result: Owa = {
+    type: 'TypeError',
+    isError: true,
+    message: 'Ahoy',
+  };
   let env = environment;
   // forEachではreturnを使って値を返せないので書きづらく、
   // またreduceでは条件分岐が複雑になり書きづらいので、for文を使って処理しています
