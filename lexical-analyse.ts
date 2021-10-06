@@ -32,7 +32,8 @@ function countIdentChars(source: string) {
   return readPosition;
 }
 
-module.exports.lexicalAnalyse = function (source: string): Tokens {
+// eslint-disable-next-line no-unused-vars
+const lexicalAnalyse: (source: string) => Tokens = (source) => {
   const tokens: Tokens = [];
   let readPosition = 0;
   while (readPosition < source.length) {
@@ -135,3 +136,5 @@ module.exports.lexicalAnalyse = function (source: string): Tokens {
   }
   return tokens;
 };
+
+export default lexicalAnalyse;

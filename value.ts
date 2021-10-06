@@ -8,6 +8,7 @@ import {
 export const nullValue: NullValue = {
   type: 'NullValue',
   isError: false,
+  value: null
 };
 
 export const intValue = (value: number): IntValue => ({
@@ -16,7 +17,7 @@ export const intValue = (value: number): IntValue => ({
   value,
 });
 
-export const boolBalue = (value: boolean): BoolValue => ({
+export const boolValue = (value: boolean): BoolValue => ({
   type: 'BoolValue',
   isError: false,
   value,

@@ -130,5 +130,3 @@ function evaluate(ast, environment) {
       return evaluaterError(ast.type, environment);
   }
 }
-
-exports.evaluate = evaluate;

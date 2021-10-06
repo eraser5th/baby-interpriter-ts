@@ -16,7 +16,7 @@ export type ParseBlock = (tokens: Tokens) => {
     parsedTokensCount: number
 } | InvalidStatements
 
-type IfStatement = {
+export type IfStatement = {
     type: 'If',
     condition: Expression,
     statements: (Statement)[]
@@ -29,7 +29,7 @@ export type ParseIfStatement = (tokens: Tokens) => {
     parsedTokensCount: number
 } | InvalidIfStatement
 
-type Assignment = {
+export type Assignment = {
     type: 'Assignment',
     name: string,
     expression: Expression | AddSubMulDiv | FuncCall | Literal | Variable
@@ -64,7 +64,7 @@ export type InvalidStatement = {
     parsedTokensCount: undefined
 }
 
-type DefineFunction = {
+export type DefineFunction = {
     type: 'FuncDef',
     name: string,
     arguments: string[],
@@ -78,10 +78,17 @@ export type ParseDefineFunction = (tokens: Tokens) => {
     parsedTokensCount: number,
 } | InvalidDefineFunction
 
-type Source = {
+export type Source = {
     type: 'Source';
     partsOfSource: (Statement | DefineFunction)[];
 }
+
+export type AddStatement = {
+    type: 'AddStatement',
+    left: Source,
+    right: Source,
+}
+
 type SyntaxError = {
     type: 'SyntaxError',
     message: string,
