@@ -1,34 +1,71 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-unused-vars */
-import { Environment, NullValue } from './valueTypes';
-import { Statement } from './statementAssignmentTypes';
+import {
+  BoolValue, Environment, IntValue, NullValue,
+} from './valueTypes';
+import {
+  DefineFunction, IfStatement, Source, Statement,
+} from './statementAssignmentTypes';
+import { AddSubMulDiv } from './expressionTypes';
 
-export type Owa = {
-    type: string,
-    isError: boolean,
+type EvaluatorErrorResult = {
+    type: 'EvaluatorError',
     message: string
 }
 
-type TypeErrorResult = {
-    type: 'TypeError',
+type EvaluatorErrorResponse = {
+    result: EvaluatorErrorResult,
+    environment: Environment,
     isError: true,
-    message: string,
-}
-
-export type OwaOwary = {
-  result: Owa | TypeErrorResult
-  environment: Environment
 }
 
 export type EvaluatorError = (
-    type: Statement,
+    type: string,
     environment: Environment
-) => OwaOwary
+) => EvaluatorErrorResponse
+
+type TypeErrorResult = {
+    type: 'TypeError',
+    message: string,
+}
+
+type TypeErrorResponse = {
+    result: TypeErrorResult,
+    environment: Environment,
+    isError: true,
+}
+
 export type TypeError = (
-    type: Statement,
+    type: string,
     environment: Environment
-) => OwaOwary
-export type EvaluateStatements = (
-    statements: Statement[],
+) => TypeErrorResponse
+
+export type ValueResponse = {
+    result: NullValue | IntValue | BoolValue
+    isError: false,
     environment: Environment
-) => OwaOwary | NullValue
+}
+
+export type EvaluatePartsOfSource = (
+    statements: (Statement | DefineFunction)[],
+    environment: Environment
+) => ValueResponse | EvaluatorErrorResponse | TypeErrorResponse
+
+export type EvaluateIfStatement = (
+    ast: IfStatement,
+    initialEnvironment: Environment
+) => ValueResponse | EvaluatorErrorResponse | TypeErrorResponse
+
+export type EvaluateAdd = (
+    ast: AddSubMulDiv,
+    environment: Environment
+) => {
+    result: IntValue,
+    isError: false,
+    environment: Environment
+} | TypeErrorResponse | EvaluatorErrorResponse
+
+export type Evaluate = (
+    ast: Statement | Source | DefineFunction,
+    environment: Environment
+) => ValueResponse | TypeErrorResponse | EvaluatorErrorResponse

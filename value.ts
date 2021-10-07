@@ -7,18 +7,16 @@ import {
 
 export const nullValue: NullValue = {
   type: 'NullValue',
-  isError: false,
+  value: null,
 };
 
 export const intValue = (value: number): IntValue => ({
   type: 'IntValue',
-  isError: false,
   value,
 });
 
-export const boolBalue = (value: boolean): BoolValue => ({
+export const boolValue = (value: boolean): BoolValue => ({
   type: 'BoolValue',
-  isError: false,
   value,
 });
 

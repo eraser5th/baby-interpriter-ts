@@ -1,4 +1,7 @@
+/* eslint-disable no-use-before-define */
+
 import {
+  boolValue,
   intValue,
   nullValue,
 } from './value';
@@ -6,110 +9,101 @@ import {
 import {
   EvaluatorError,
   TypeError,
-  EvaluateStatements,
-  OwaOwary,
-  Owa,
+  ValueResponse,
+  EvaluateIfStatement,
+  EvaluateAdd,
+  Evaluate,
+  EvaluatePartsOfSource,
 } from './evaluatorTypes';
+import { BoolValue, IntValue, NullValue } from './valueTypes';
 
 const evaluatorError: EvaluatorError = (type, environment) => ({
   result: {
     type: 'EvaluatorError',
-    isError: true,
     message: `無効なast\`${type}\`が渡されました`,
   },
+  isError: true,
   environment,
 });
 
 const typeError: TypeError = (type, environment) => ({
   result: {
     type: 'TypeError',
-    isError: true,
     message: `無効な型\`${type}\`が渡されました`,
   },
+  isError: true,
   environment,
 });
 
-const evaluateStatements: EvaluateStatements = (statements, environment) => {
-  if (statements.length === 0) return nullValue;
-  let result: Owa = {
-    type: 'TypeError',
-    isError: true,
-    message: 'Ahoy',
-  };
+const evaluatePartsOfSource: EvaluatePartsOfSource = (statements, environment) => {
+  let result: IntValue | BoolValue | NullValue = nullValue;
   let env = environment;
   // forEachではreturnを使って値を返せないので書きづらく、
   // またreduceでは条件分岐が複雑になり書きづらいので、for文を使って処理しています
   // eslint-disable-next-line no-restricted-syntax
   for (const stmt of statements) {
-    // eslint-disable-next-line no-use-before-define
     const evalResult = evaluate(stmt, env);
+    if (evalResult.isError) {
+      return evalResult;
+    }
     if (evalResult === null) {
-      return evaluatorError(stmt, env);
+      return evaluatorError(stmt.type, env);
     }
     result = evalResult.result;
     env = evalResult.environment;
   }
-  const res: OwaOwary = {
+  const res: ValueResponse = {
     result,
+    isError: false,
     environment: env,
   };
-  return { result, environment: env };
+  return res;
 };
 
-function evaluateIfStatement(ast, initialEnvironment) {
+const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
   const { condition, statements } = ast;
-  // eslint-disable-next-line no-use-before-define
   const evalResult = evaluate(condition, initialEnvironment);
-  if (evalResult === null) {
-    return evaluatorError(condition, initialEnvironment);
-  }
+  if (evalResult.isError) return evalResult;
+
   const { result, environment: halfwayEnvironment } = evalResult;
   if ((result.type === 'BoolValue' && result.value === false) || result.type === 'NullValue') {
     return {
       result: nullValue,
+      isError: false,
       environment: halfwayEnvironment,
     };
   }
-  // eslint-disable-next-line no-use-before-define
-  return evaluateStatements(statements, halfwayEnvironment);
-}
+  return evaluatePartsOfSource(statements, halfwayEnvironment);
+};
 
-function evaluateAdd(ast, environment) {
-  const {
-    result: leftResult,
-    environment: leftEnvironment,
-    // eslint-disable-next-line no-use-before-define
-  } = evaluate(ast.left, environment);
-  if (leftResult.isError) {
-    return { result: leftResult, environment: leftEnvironment };
+const evaluateAdd: EvaluateAdd = (ast, environment) => {
+  const leftEvalRes = evaluate(ast.left, environment);
+  if (leftEvalRes.isError) return leftEvalRes;
+  if (leftEvalRes.result.type !== 'IntValue') {
+    return typeError(leftEvalRes.result.type, leftEvalRes.environment);
   }
-  if (leftResult.type !== 'IntValue') {
-    return typeError(leftResult.type);
+  const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
+  if (rightEvalRes.isError) {
+    return rightEvalRes;
   }
-  const {
-    result: rightResult,
-    environment: rightEnvironment,
-  // eslint-disable-next-line no-use-before-define
-  } = evaluate(ast.right, leftEnvironment);
-  if (rightResult.isError) {
-    return { result: rightResult, environment: rightEnvironment };
-  }
-  if (rightResult.type !== 'IntValue') {
-    return typeError(rightResult.type);
+  if (rightEvalRes.result.type !== 'IntValue') {
+    return typeError(rightEvalRes.result.type, environment);
   }
   return {
-    result: intValue(leftResult.value + rightResult.value),
-    environment: rightEnvironment,
+    result: intValue(leftEvalRes.result.value + rightEvalRes.result.value),
+    isError: false,
+    environment: rightEvalRes.environment,
   };
-}
+};
 
-function evaluate(ast, environment) {
+const evaluate: Evaluate = (ast, environment) => {
   switch (ast.type) {
     case 'Source':
-      return evaluateStatements(ast.statements, environment);
+      return evaluatePartsOfSource(ast.partsOfSource, environment);
     case 'Assignment':
       return {
         result: nullValue,
+        isError: false,
         environment: {
           variables: new Map(environment.variables).set(
             ast.name,
@@ -125,26 +119,30 @@ function evaluate(ast, environment) {
     case 'Variable':
       return {
         result: environment.variables.get(ast.name) || nullValue,
+        isError: false,
         environment,
       };
     case 'IntLiteral':
       return {
         result: intValue(ast.value),
+        isError: false,
         environment,
       };
     case 'BoolLiteral':
       return {
-        result: boolBalue(ast.value),
+        result: boolValue(ast.value),
+        isError: false,
         environment,
       };
     case 'NullLiteral':
       return {
         result: nullValue,
+        isError: false,
         environment,
       };
     default:
       return evaluatorError(ast.type, environment);
   }
-}
+};
 
 exports.evaluate = evaluate;
