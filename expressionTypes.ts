@@ -8,16 +8,20 @@ type BoolLiteral = { type: 'BoolLiteral', value: boolean }
 type NullLiteral = { type: 'NullLiteral' }
 
 export type Literal = IntLiteral | BoolLiteral | NullLiteral
+
 export type Variable = {
     type: 'Variable',
     name: string
 }
+
 export type FuncCall = {
     type: 'FuncCall',
     name: string,
     arguments: Expression[]
 }
+
 type InfixOperator = 'Sub' | 'Add' | 'Mul' | 'Div'
+
 export type AddSubMulDiv = {
     type: InfixOperator,
     left: Expression

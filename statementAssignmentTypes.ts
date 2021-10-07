@@ -16,7 +16,7 @@ export type ParseBlock = (tokens: Tokens) => {
     parsedTokensCount: number
 } | InvalidStatements
 
-type IfStatement = {
+export type IfStatement = {
     type: 'If',
     condition: Expression,
     statements: (Statement)[]
@@ -64,7 +64,7 @@ export type InvalidStatement = {
     parsedTokensCount: undefined
 }
 
-type DefineFunction = {
+export type DefineFunction = {
     type: 'FuncDef',
     name: string,
     arguments: string[],
@@ -78,7 +78,7 @@ export type ParseDefineFunction = (tokens: Tokens) => {
     parsedTokensCount: number,
 } | InvalidDefineFunction
 
-type Source = {
+export type Source = {
     type: 'Source';
     partsOfSource: (Statement | DefineFunction)[];
 }
