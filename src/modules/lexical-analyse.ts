@@ -1,4 +1,4 @@
-import { Tokens } from './tokenTypes';
+import { Tokens } from '../types/tokenTypes';
 
 function isDigit(char: string) {
   const charCode = char.charCodeAt(0);

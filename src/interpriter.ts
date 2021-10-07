@@ -2,11 +2,11 @@
 /* eslint-disable no-console */
 
 import prompts from 'prompts';
-import { Token } from './tokenTypes';
-import { emptyEnvironment } from './value';
-import lexicalAnalyse from './lexical-analyse';
-import parseSource from './statementAndAssignmentParser';
-import evaluate from './evaluator';
+import { Token } from './types/tokenTypes';
+import { emptyEnvironment } from './modules/value';
+import lexicalAnalyse from './modules/lexical-analyse';
+import parseSource from './modules/statementAndAssignmentParser';
+import evaluate from './modules/evaluator';
 
 async function read() {
   const respond = await prompts({

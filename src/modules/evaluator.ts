@@ -14,8 +14,8 @@ import {
   EvaluateAdd,
   Evaluate,
   EvaluatePartsOfSource,
-} from './evaluatorTypes';
-import { BoolValue, IntValue, NullValue } from './valueTypes';
+} from '../types/evaluatorTypes';
+import { BoolValue, IntValue, NullValue } from '../types/valueTypes';
 
 const evaluatorError: EvaluatorError = (type, environment) => ({
   result: {
