@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-const { lexicalAnalyse } = require('./lexical-analyse');
+const { lexicalAnalyse } = require('../modules/lexical-analyse');
 
 describe('字句解析', () => {
   test('空文字列', () => {
