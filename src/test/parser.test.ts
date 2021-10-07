@@ -1,7 +1,8 @@
 /* eslint-disable no-undef */
 
+import lexicalAnalyse from '../modules/lexical-analyse';
+
 const { parse } = require('./parser');
-const { lexicalAnalyse } = require('./lexical-analyse');
 
 describe('構文解析', () => {
   test('空', () => {

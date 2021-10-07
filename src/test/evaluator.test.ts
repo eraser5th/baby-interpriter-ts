@@ -32,9 +32,9 @@ describe('評価', () => {
       {
         result: {
           type: 'IntValue',
-          isError: false,
           value: 1,
         },
+        isError: false,
         environment: {
           variables: new Map(),
           functions: new Map(),
@@ -48,9 +48,9 @@ describe('評価', () => {
         {
           result: {
             type: 'IntValue',
-            isError: false,
             value: 3,
           },
+          isError: false,
           environment: {
             variables: new Map(),
             functions: new Map(),
@@ -68,9 +68,9 @@ describe('評価', () => {
       {
         result: {
           type: 'IntValue',
-          isError: false,
           value: 2,
         },
+        isError: false,
         environment: {
           variables: new Map(),
           functions: new Map(),
@@ -83,8 +83,9 @@ describe('評価', () => {
       {
         result: {
           type: 'NullValue',
-          isError: false,
+          value: null,
         },
+        isError: false,
         environment: {
           variables: new Map([
             ['a', {
@@ -104,7 +105,6 @@ describe('評価', () => {
         variables: new Map([
           ['value', {
             type: 'IntValue',
-            isError: false,
             value: 123,
           }],
         ]),
@@ -113,9 +113,9 @@ describe('評価', () => {
         {
           result: {
             type: 'IntValue',
-            isError: false,
             value: 123,
           },
+          isError: false,
           environment: {
             variables: new Map([
               ['value', {
