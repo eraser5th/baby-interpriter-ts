@@ -35,7 +35,7 @@ const isUnknownCharacter = (token: Token): boolean => token.type === 'UnknownCha
       continue;
     }
     const resultObject = evaluate(ast, environment);
-    if (resultObject.result.isError) {
+    if (resultObject.isError) {
       console.error(resultObject);
       continue;
     }
