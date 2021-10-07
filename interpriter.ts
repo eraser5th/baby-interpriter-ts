@@ -1,13 +1,12 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-console */
 
+import prompts from 'prompts';
 import { Token } from './tokenTypes';
-
-const prompts = require('prompts');
-const { Environment } = require('./value');
-const { lexicalAnalyse } = require('./lexical-analyse');
-const { parse } = require('./parser');
-const { evaluate } = require('./evaluator');
+import { emptyEnvironment } from './value';
+import lexicalAnalyse from './lexical-analyse';
+import parseSource from './statementAndAssignmentParser';
+import evaluate from './evaluator';
 
 async function read() {
   const respond = await prompts({
@@ -18,9 +17,10 @@ async function read() {
   return respond.value;
 }
 
+const isUnknownCharacter = (token: Token): boolean => token.type === 'UnknownCharacter';
+
 (async () => {
-  let environment = Environment;
-  const isUnknownCharacter = (token: Token): boolean => token.type === 'UnknownCharacter';
+  let environment = emptyEnvironment;
   for (;;) {
     // eslint-disable-next-line no-await-in-loop
     const tokens = lexicalAnalyse(await read());
@@ -29,7 +29,7 @@ async function read() {
       console.error(lexicalError);
       continue;
     }
-    const ast = parse(tokens);
+    const ast = parseSource(tokens);
     if (ast.type === 'SyntaxError') {
       console.error(ast);
       continue;

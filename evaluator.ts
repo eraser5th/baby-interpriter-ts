@@ -145,4 +145,4 @@ const evaluate: Evaluate = (ast, environment) => {
   }
 };
 
-exports.evaluate = evaluate;
+export default evaluate;

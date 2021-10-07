@@ -255,4 +255,4 @@ const parseSource: ParseSource = (tokens) => {
   };
 };
 
-module.exports.parse = parseSource;
+export default parseSource;
