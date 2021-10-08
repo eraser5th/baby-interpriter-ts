@@ -82,7 +82,7 @@ export type Source = {
     type: 'Source';
     partsOfSource: (Statement | DefineFunction)[];
 }
-type SyntaxError = {
+export type SyntaxError = {
     type: 'SyntaxError',
     message: string,
     headToken: Token,
