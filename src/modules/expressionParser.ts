@@ -19,16 +19,10 @@ const InvalidExpression = () => ({
   parsedTokensCount: undefined,
 });
 
-class InvalidArguments {
-  args: null
-
-  parsedTokensCount: undefined
-
-  constructor() {
-    this.args = null;
-    this.parsedTokensCount = undefined;
-  }
-}
+const InvalidArguments = () => ({
+  args: null,
+  parsedTokensCount: undefined,
+});
 
 const parseLiteral: ParseLiteral = (tokens) => {
   if (tokens.length === 0) {
@@ -87,6 +81,7 @@ const parseParenthesisExpression: ParseParenthesisExpression = (tokens) => {
   if (!parsedExpression.expression) return InvalidExpression();
 
   const { expression, parsedTokensCount } = parsedExpression;
+  console.log('tokens:', tokens, ' parsedTokensCount:', parsedTokensCount);
   // 閉じ括弧が存在しないので無効な式を返す
   if (tokens[parsedTokensCount + 1]?.type !== 'RParen') return InvalidExpression();
 
@@ -113,7 +108,7 @@ const parseCommaSeparatedExpressions: ParseCommaSeparatedExpressions = (tokens) 
   while (tokens[readPosition]?.type === 'Comma') {
     readPosition += 1;
     const { expression, parsedTokensCount } = parseExpression(tokens.slice(readPosition));
-    if (!expression || !parsedTokensCount) return new InvalidArguments();
+    if (!expression || !parsedTokensCount) return InvalidArguments();
     args.push(expression);
     readPosition += parsedTokensCount;
   }
@@ -205,5 +200,4 @@ const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
 };
 
 const parseExpression: ParseExpression = (tokens) => parseAddSubExpression(tokens);
-
 export default parseExpression;

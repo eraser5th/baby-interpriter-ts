@@ -127,6 +127,63 @@ const testCase: TestCase = [
     input: 'null',
     output: [{ type: 'Null' }],
   },
+  {
+    testName: '(a())',
+    input: '(a())',
+    output: [
+      { type: 'LParen' },
+      { type: 'Ident', name: 'a' },
+      { type: 'LParen' },
+      { type: 'RParen' },
+      { type: 'RParen' },
+    ],
+  },
+  {
+    testName: '(',
+    input: '(',
+    output: [{ type: 'LParen' }],
+  },
+  {
+    testName: ')',
+    input: ')',
+    output: [{ type: 'RParen' }],
+  },
+  {
+    testName: '(()',
+    input: '(()',
+    output: [
+      { type: 'LParen' },
+      { type: 'LParen' },
+      { type: 'RParen' },
+    ],
+  },
+  {
+    testName: '())',
+    input: '())',
+    output: [
+      { type: 'LParen' },
+      { type: 'RParen' },
+      { type: 'RParen' },
+    ],
+  },
+  {
+    testName: '(a()))*b()))',
+    input: '(a()))*b()))',
+    output: [
+      { type: 'LParen' },
+      { type: 'Ident', name: 'a' },
+      { type: 'LParen' },
+      { type: 'RParen' },
+      { type: 'RParen' },
+      { type: 'RParen' },
+      { type: 'Asterisk' },
+      { type: 'Ident', name: 'b' },
+      { type: 'LParen' },
+      { type: 'RParen' },
+      { type: 'RParen' },
+      { type: 'RParen' },
+    ],
+  },
 ];
 
 describe('字句解析', () => {
