@@ -1,15 +1,14 @@
 /* eslint-disable no-undef */
 
 import lexicalAnalyse from '../modules/lexical-analyse';
-
-const { parse } = require('./parser');
+import parseSource from '../modules/statementAndAssignmentParser';
 
 describe('構文解析', () => {
   test('空', () => {
-    expect(parse([])).toStrictEqual({ type: 'Source', statements: [] });
+    expect(parseSource([])).toStrictEqual({ type: 'Source', statements: [] });
   });
   test('1;', () => {
-    expect(parse([
+    expect(parseSource([
       { type: 'Int', value: 1 },
       { type: 'Semicolon' },
     ])).toStrictEqual(
@@ -22,7 +21,7 @@ describe('構文解析', () => {
     );
   });
   test('1+2;', () => {
-    expect(parse([
+    expect(parseSource([
       { type: 'Int', value: 1 },
       { type: 'Plus' },
       { type: 'Int', value: 2 },
@@ -42,19 +41,19 @@ describe('構文解析', () => {
   });
   describe('シンタックスエラー系', () => {
     test('1', () => {
-      expect(parse([
+      expect(parseSource([
         { type: 'Int', value: 1 },
       ]).type).toBe('SyntaxError');
     });
     test('1+;', () => {
-      expect(parse([
+      expect(parseSource([
         { type: 'Int', value: 1 },
         { type: 'Plus' },
         { type: 'Semicolon' },
       ]).type).toBe('SyntaxError');
     });
     test('1+(;', () => {
-      expect(parse([
+      expect(parseSource([
         { type: 'Int', value: 1 },
         { type: 'Plus' },
         { type: 'LParen' },
@@ -62,10 +61,10 @@ describe('構文解析', () => {
       ]).type).toBe('SyntaxError');
     });
     test('複数の文(空)', () => {
-      expect(parse([{ type: 'Semicolon' }]).type).toBe('SyntaxError');
+      expect(parseSource([{ type: 'Semicolon' }]).type).toBe('SyntaxError');
     });
     test('複数の文(空)', () => {
-      expect(parse([
+      expect(parseSource([
         { type: 'Semicolon' },
         { type: 'Semicolon' },
       ]).type).toBe('SyntaxError');
@@ -73,7 +72,7 @@ describe('構文解析', () => {
   });
   const lex = lexicalAnalyse;
   test('1+2+3;', () => {
-    expect(parse(lex('1+2+3;'))).toStrictEqual(
+    expect(parseSource(lex('1+2+3;'))).toStrictEqual(
       {
         type: 'Source',
         statements: [
@@ -91,7 +90,7 @@ describe('構文解析', () => {
     );
   });
   test('複数の文', () => {
-    expect(parse(lex('1;\n2;'))).toStrictEqual(
+    expect(parseSource(lex('1;\n2;'))).toStrictEqual(
       {
         type: 'Source',
         statements: [
@@ -103,7 +102,7 @@ describe('構文解析', () => {
   });
   describe('各種リテラル', () => {
     test('整数', () => {
-      expect(parse(lex('123;'))).toStrictEqual(
+      expect(parseSource(lex('123;'))).toStrictEqual(
         {
           type: 'Source',
           statements: [{ type: 'IntLiteral', value: 123 }],
@@ -112,7 +111,7 @@ describe('構文解析', () => {
     });
     describe('真偽値', () => {
       test('true', () => {
-        expect(parse(lex('true;'))).toStrictEqual(
+        expect(parseSource(lex('true;'))).toStrictEqual(
           {
             type: 'Source',
             statements: [{ type: 'BoolLiteral', value: true }],
@@ -120,7 +119,7 @@ describe('構文解析', () => {
         );
       });
       test('false', () => {
-        expect(parse(lex('false;'))).toStrictEqual(
+        expect(parseSource(lex('false;'))).toStrictEqual(
           {
             type: 'Source',
             statements: [{ type: 'BoolLiteral', value: false }],
@@ -129,7 +128,7 @@ describe('構文解析', () => {
       });
     });
     test('null', () => {
-      expect(parse(lex('null;'))).toStrictEqual(
+      expect(parseSource(lex('null;'))).toStrictEqual(
         {
           type: 'Source',
           statements: [{ type: 'NullLiteral' }],
@@ -138,7 +137,7 @@ describe('構文解析', () => {
     });
   });
   test('変数', () => {
-    expect(parse(lex('abc;'))).toStrictEqual(
+    expect(parseSource(lex('abc;'))).toStrictEqual(
       {
         type: 'Source',
         statements: [
@@ -148,7 +147,7 @@ describe('構文解析', () => {
     );
   });
   test('括弧', () => {
-    expect(parse(lex('(123);'))).toStrictEqual(
+    expect(parseSource(lex('(123);'))).toStrictEqual(
       {
         type: 'Source',
         statements: [
@@ -158,7 +157,7 @@ describe('構文解析', () => {
     );
   });
   test('入れ子の括弧', () => {
-    expect(parse(lex('1+(2+3);'))).toStrictEqual(
+    expect(parseSource(lex('1+(2+3);'))).toStrictEqual(
       {
         type: 'Source',
         statements: [
@@ -177,7 +176,7 @@ describe('構文解析', () => {
   });
   describe('関数呼び出し', () => {
     test('引数0個', () => {
-      expect(parse(lex('call();'))).toStrictEqual(
+      expect(parseSource(lex('call();'))).toStrictEqual(
         {
           type: 'Source',
           statements: [
@@ -191,7 +190,7 @@ describe('構文解析', () => {
       );
     });
     test('引数1個', () => {
-      expect(parse(lex('abc(12);'))).toStrictEqual(
+      expect(parseSource(lex('abc(12);'))).toStrictEqual(
         {
           type: 'Source',
           statements: [
@@ -207,7 +206,7 @@ describe('構文解析', () => {
       );
     });
     test('引数2個', () => {
-      expect(parse(lex('xxx((12), 3+4);'))).toStrictEqual(
+      expect(parseSource(lex('xxx((12), 3+4);'))).toStrictEqual(
         {
           type: 'Source',
           statements: [
@@ -228,7 +227,7 @@ describe('構文解析', () => {
       );
     });
     test('引数と演算', () => {
-      expect(parse(lex('x()+y();'))).toStrictEqual(
+      expect(parseSource(lex('x()+y();'))).toStrictEqual(
         {
           type: 'Source',
           statements: [
@@ -250,12 +249,12 @@ describe('構文解析', () => {
       );
     });
     test('引数の構文解析に失敗', () => {
-      expect(parse(lex('func(+);')).type).toBe('SyntaxError');
+      expect(parseSource(lex('func(+);')).type).toBe('SyntaxError');
     });
   });
   describe('代入文', () => {
     test('基本の形', () => {
-      expect(parse(lex('two=1+1;'))).toStrictEqual(
+      expect(parseSource(lex('two=1+1;'))).toStrictEqual(
         {
           type: 'Source',
           statements: [
@@ -273,15 +272,15 @@ describe('構文解析', () => {
       );
     });
     test('セミコロンの確認', () => {
-      expect(parse(lex('two=1+1')).type).toBe('SyntaxError');
+      expect(parseSource(lex('two=1+1')).type).toBe('SyntaxError');
     });
     test('式の構文解析に失敗', () => {
-      expect(parse(lex('a=;')).type).toBe('SyntaxError');
+      expect(parseSource(lex('a=;')).type).toBe('SyntaxError');
     });
   });
   describe('if', () => {
     test('文が0個', () => {
-      expect(parse(lex('if(true) { }'))).toStrictEqual(
+      expect(parseSource(lex('if(true) { }'))).toStrictEqual(
         {
           type: 'Source',
           statements: [
@@ -295,7 +294,7 @@ describe('構文解析', () => {
       );
     });
     test('文が1個', () => {
-      expect(parse(lex('if(true) { 1; }'))).toStrictEqual(
+      expect(parseSource(lex('if(true) { 1; }'))).toStrictEqual(
         {
           type: 'Source',
           statements: [
@@ -309,7 +308,7 @@ describe('構文解析', () => {
       );
     });
     test('文が2個', () => {
-      expect(parse(lex('if(true) { 1; 2; }'))).toStrictEqual(
+      expect(parseSource(lex('if(true) { 1; 2; }'))).toStrictEqual(
         {
           type: 'Source',
           statements: [
@@ -327,20 +326,20 @@ describe('構文解析', () => {
     });
     describe('エラー処理', () => {
       test('丸括弧が閉じず失敗', () => {
-        expect(parse(lex('if(1')).type).toBe('SyntaxError');
+        expect(parseSource(lex('if(1')).type).toBe('SyntaxError');
       });
       test('ブロックの構文解析に失敗', () => {
-        expect(parse(lex('if(true) { 1+1 }')).type).toBe('SyntaxError');
+        expect(parseSource(lex('if(true) { 1+1 }')).type).toBe('SyntaxError');
       });
       test('ブロックがなくて失敗', () => {
-        expect(parse(lex('if(false)')).type).toBe('SyntaxError');
+        expect(parseSource(lex('if(false)')).type).toBe('SyntaxError');
       });
       test('ブロックが閉じず失敗', () => {
-        expect(parse(lex('if(false){')).type).toBe('SyntaxError');
+        expect(parseSource(lex('if(false){')).type).toBe('SyntaxError');
       });
     });
     test('ifの後の式', () => {
-      expect(parse(lex('if(true){ } 123;'))).toStrictEqual({
+      expect(parseSource(lex('if(true){ } 123;'))).toStrictEqual({
         type: 'Source',
         statements: [
           {
@@ -358,7 +357,7 @@ describe('構文解析', () => {
   });
   describe('関数定義', () => {
     test('引数が0個、文が0個', () => {
-      expect(parse(lex('def funcname() { }'))).toStrictEqual({
+      expect(parseSource(lex('def funcname() { }'))).toStrictEqual({
         type: 'Source',
         statements: [
           {
@@ -371,7 +370,7 @@ describe('構文解析', () => {
       });
     });
     test('引数が1個、文が0個', () => {
-      expect(parse(lex('def funcname(argument) { }'))).toStrictEqual({
+      expect(parseSource(lex('def funcname(argument) { }'))).toStrictEqual({
         type: 'Source',
         statements: [
           {
@@ -384,7 +383,7 @@ describe('構文解析', () => {
       });
     });
     test('引数が2個、文が0個', () => {
-      expect(parse(lex('def funcname(xxx, yyy) { }'))).toStrictEqual({
+      expect(parseSource(lex('def funcname(xxx, yyy) { }'))).toStrictEqual({
         type: 'Source',
         statements: [
           {
@@ -397,7 +396,7 @@ describe('構文解析', () => {
       });
     });
     test('引数が0個、文が1個', () => {
-      expect(parse(lex('def funcname() { 123; }'))).toStrictEqual({
+      expect(parseSource(lex('def funcname() { 123; }'))).toStrictEqual({
         type: 'Source',
         statements: [
           {
@@ -412,7 +411,7 @@ describe('構文解析', () => {
       });
     });
     test('引数が0個、文が2個', () => {
-      expect(parse(lex('def funcname() { 123; 456; }'))).toStrictEqual({
+      expect(parseSource(lex('def funcname() { 123; 456; }'))).toStrictEqual({
         type: 'Source',
         statements: [
           {
@@ -429,17 +428,17 @@ describe('構文解析', () => {
     });
     describe('エラー処理', () => {
       test('引数に違うトークン', () => {
-        expect(parse(lex('def name(123)')).type).toBe('SyntaxError');
-        expect(parse(lex('def name(abc, 123)')).type).toBe('SyntaxError');
+        expect(parseSource(lex('def name(123)')).type).toBe('SyntaxError');
+        expect(parseSource(lex('def name(abc, 123)')).type).toBe('SyntaxError');
       });
       test('引数の括弧が閉じない', () => {
-        expect(parse(lex('def name(')).type).toBe('SyntaxError');
+        expect(parseSource(lex('def name(')).type).toBe('SyntaxError');
       });
       test('ブロックの括弧が閉じない', () => {
-        expect(parse(lex('def name() {')).type).toBe('SyntaxError');
+        expect(parseSource(lex('def name() {')).type).toBe('SyntaxError');
       });
       test('ブロックでエラー', () => {
-        expect(parse(lex('def name() { nonsemicolon }')).type).toBe('SyntaxError');
+        expect(parseSource(lex('def name() { nonsemicolon }')).type).toBe('SyntaxError');
       });
     });
   });
