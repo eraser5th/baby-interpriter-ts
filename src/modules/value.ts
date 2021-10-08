@@ -3,7 +3,7 @@ import {
   IntValue,
   BoolValue,
   Environment,
-} from './valueTypes';
+} from '../types/valueTypes';
 
 export const nullValue: NullValue = {
   type: 'NullValue',

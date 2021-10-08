@@ -13,7 +13,7 @@ import {
   ParseSource,
   ParseStatement,
   Statement,
-} from './statementAssignmentTypes';
+} from '../types/statementAssignmentTypes';
 
 class InvalidStatements {
   statements: null

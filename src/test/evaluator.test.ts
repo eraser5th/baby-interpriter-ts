@@ -1,25 +1,17 @@
 /* eslint-disable no-undef */
 
-const { evaluate } = require('./evaluator');
-const { parse } = require('./parser');
-const { lexicalAnalyse } = require('./lexical-analyse');
-const { emptyEnvironment, nullValue, intValue } = require('./value');
+import evaluate from '../modules/evaluator';
+import lexicalAnalyse from '../modules/lexical-analyse';
+import parseSource from '../modules/statementAndAssignmentParser';
+import { Source } from '../types/statementAssignmentTypes';
+import { emptyEnvironment, intValue, nullValue } from '../modules/value';
 
-function lexAndParse(source) {
-  return parse(lexicalAnalyse(source));
+function lexAndParse(source: string) {
+  return parseSource(lexicalAnalyse(source)) as Source;
 }
 
 describe('評価', () => {
   describe('エラー処理', () => {
-    test('不明なAST', () => {
-      expect(evaluate({
-        type: 'Source',
-        statements: [{ type: 'UnknownAST' }],
-      }, {
-        variables: new Map(),
-        functions: new Map(),
-      }).result.type).toBe('EvaluatorError');
-    });
     test('型エラー', () => {
       expect(evaluate(lexAndParse('a+1;'), {
         variables: new Map([['a', { type: 'NullValue' }]]),
@@ -40,9 +32,9 @@ describe('評価', () => {
       {
         result: {
           type: 'IntValue',
-          isError: false,
           value: 1,
         },
+        isError: false,
         environment: {
           variables: new Map(),
           functions: new Map(),
@@ -56,9 +48,9 @@ describe('評価', () => {
         {
           result: {
             type: 'IntValue',
-            isError: false,
             value: 3,
           },
+          isError: false,
           environment: {
             variables: new Map(),
             functions: new Map(),
@@ -76,9 +68,9 @@ describe('評価', () => {
       {
         result: {
           type: 'IntValue',
-          isError: false,
           value: 2,
         },
+        isError: false,
         environment: {
           variables: new Map(),
           functions: new Map(),
@@ -91,8 +83,9 @@ describe('評価', () => {
       {
         result: {
           type: 'NullValue',
-          isError: false,
+          value: null,
         },
+        isError: false,
         environment: {
           variables: new Map([
             ['a', {
@@ -112,7 +105,6 @@ describe('評価', () => {
         variables: new Map([
           ['value', {
             type: 'IntValue',
-            isError: false,
             value: 123,
           }],
         ]),
@@ -121,9 +113,9 @@ describe('評価', () => {
         {
           result: {
             type: 'IntValue',
-            isError: false,
             value: 123,
           },
+          isError: false,
           environment: {
             variables: new Map([
               ['value', {

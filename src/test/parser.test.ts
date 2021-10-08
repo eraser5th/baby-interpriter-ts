@@ -1,21 +1,10 @@
 /* eslint-disable no-undef */
 
-const { parse } = require('./parser');
-const { lexicalAnalyse } = require('./lexical-analyse');
+import lexicalAnalyse from '../modules/lexical-analyse';
 
-const lex = lexicalAnalyse;
+const { parse } = require('./parser');
 
 describe('構文解析', () => {
-  describe('単項演算子', () => {
-    test('+2;', () => {
-      expect(parse(lex('+2;'))).toStrictEqual({ type: 'Source', statements: [{ type: 'Unary', statement: { type: 'IntLiteral', value: 2 } }] });
-    });
-  });
-  describe('掛け算', () => {
-    test('1*2', () => {
-      expect(parse(lex('1*2;'))).toStrictEqual({ type: 'Source', statements: [{ type: 'Mul', left: { type: 'IntLiteral', value: 1 }, right: { type: 'IntLiteral', value: 2 } }] });
-    });
-  });
   test('空', () => {
     expect(parse([])).toStrictEqual({ type: 'Source', statements: [] });
   });
@@ -82,6 +71,7 @@ describe('構文解析', () => {
       ]).type).toBe('SyntaxError');
     });
   });
+  const lex = lexicalAnalyse;
   test('1+2+3;', () => {
     expect(parse(lex('1+2+3;'))).toStrictEqual(
       {
@@ -347,6 +337,22 @@ describe('構文解析', () => {
       });
       test('ブロックが閉じず失敗', () => {
         expect(parse(lex('if(false){')).type).toBe('SyntaxError');
+      });
+    });
+    test('ifの後の式', () => {
+      expect(parse(lex('if(true){ } 123;'))).toStrictEqual({
+        type: 'Source',
+        statements: [
+          {
+            type: 'If',
+            condition: { type: 'BoolLiteral', value: true },
+            statements: [],
+          },
+          {
+            type: 'IntLiteral',
+            value: 123,
+          },
+        ],
       });
     });
   });

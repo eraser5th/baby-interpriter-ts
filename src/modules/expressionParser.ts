@@ -13,7 +13,7 @@ import {
   ParseAddSubExpression,
   ParseExpression,
   ParseCommaSeparatedExpressions,
-} from './expressionTypes';
+} from '../types/expressionTypes';
 
 class InvalidExpression {
   expression: null
