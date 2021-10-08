@@ -4,7 +4,6 @@
 /* eslint-disable no-use-before-define */
 
 import {
-  // Expression
   ParseLiteral,
   ParseValue,
   ParseParenthesisExpression,
@@ -99,17 +98,6 @@ const parseParenthesisExpression: ParseParenthesisExpression = (tokens) => {
     parsedTokensCount: parsedTokensCount + 2,
   };
 };
-
-/*
-型 '(tokens: Tokens) => InvalidArguments | { args: (Literal | Variable | FuncCall | AddSubMulDiv)[]; parsedTokensCount: number; }' を型 'ParseCommaSeparatedExpressions' に割り当てることはできません。
-  型 'InvalidArguments | { args: (Literal | Variable | FuncCall | AddSubMulDiv)[]; parsedTokensCount: number; }' を型 'InvalidArguments | { args: Expression[]; parsedTokensCount: number; }' に割り当てることはできません。
-    型 '{ args: (Literal | Variable | FuncCall | AddSubMulDiv)[]; parsedTokensCount: number; }' を型 'InvalidArguments | { args: Expression[]; parsedTokensCount: number; }' に割り当てることはできません。
-      型 '{ args: (Literal | Variable | FuncCall | AddSubMulDiv)[]; parsedTokensCount: number; }' を型 '{ args: Expression[]; parsedTokensCount: number; }' に割り当てることはできません。
-        プロパティ 'args' の型に互換性がありません。
-          型 '(Literal | Variable | FuncCall | AddSubMulDiv)[]' を型 'Expression[]' に割り当てることはできません。
-            型 'Literal | Variable | FuncCall | AddSubMulDiv' を型 'Expression' に割り当てることはできません。
-              型 'IntLiteral' には 型 'Expression' からの次のプロパティがありません: expression, parsedTokensCountts(2322)
-*/
 
 // 主に関数の引数処理
 const parseCommaSeparatedExpressions: ParseCommaSeparatedExpressions = (tokens) => {
