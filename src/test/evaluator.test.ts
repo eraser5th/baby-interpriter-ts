@@ -1,14 +1,22 @@
 /* eslint-disable no-undef */
 
+/*
 import evaluate from '../modules/evaluator';
 import lexicalAnalyse from '../modules/lexical-analyse';
-import parseSource from '../modules/statementAndAssignmentParser';
+import parseSource from '../modules/statementParser';
 import { Source } from '../types/statementAssignmentTypes';
 import { emptyEnvironment, intValue, nullValue } from '../modules/value';
+import { Tokens } from '../types/tokenTypes';
 
 function lexAndParse(source: string) {
   return parseSource(lexicalAnalyse(source)) as Source;
 }
+/*
+type TestCase = {
+  testName: string,
+  input: string,
+  output: Tokens
+}[]
 
 describe('評価', () => {
   describe('エラー処理', () => {
@@ -22,7 +30,7 @@ describe('評価', () => {
   test('1;', () => {
     expect(evaluate({
       type: 'Source',
-      statements: [
+      partsOfSource: [
         { type: 'IntLiteral', value: 1 },
       ],
     }, {
@@ -271,3 +279,4 @@ describe('評価', () => {
     });
   });
 });
+*/

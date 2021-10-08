@@ -4,7 +4,6 @@
 /* eslint-disable no-use-before-define */
 
 import {
-  // Expression
   ParseLiteral,
   ParseValue,
   ParseParenthesisExpression,
@@ -15,16 +14,10 @@ import {
   ParseCommaSeparatedExpressions,
 } from '../types/expressionTypes';
 
-class InvalidExpression {
-  expression: null
-
-  parsedTokensCount: undefined
-
-  constructor() {
-    this.expression = null;
-    this.parsedTokensCount = undefined;
-  }
-}
+const InvalidExpression = () => ({
+  expression: null,
+  parsedTokensCount: undefined,
+});
 
 class InvalidArguments {
   args: null
@@ -38,6 +31,9 @@ class InvalidArguments {
 }
 
 const parseLiteral: ParseLiteral = (tokens) => {
+  if (tokens.length === 0) {
+    return InvalidExpression();
+  }
   const head = tokens[0];
   switch (head.type) {
     case 'Int':
@@ -64,7 +60,7 @@ const parseLiteral: ParseLiteral = (tokens) => {
         parsedTokensCount: 1,
       };
     default:
-      return new InvalidExpression();
+      return InvalidExpression();
   }
 };
 
@@ -88,28 +84,17 @@ const parseParenthesisExpression: ParseParenthesisExpression = (tokens) => {
   // 括弧の中身を式にする
   const parsedExpression = parseExpression(tokens.slice(1));
   // 式が無効なので無効な式を返す
-  if (!parsedExpression.expression) return new InvalidExpression();
+  if (!parsedExpression.expression) return InvalidExpression();
 
   const { expression, parsedTokensCount } = parsedExpression;
   // 閉じ括弧が存在しないので無効な式を返す
-  if (tokens[parsedTokensCount + 1]?.type !== 'RParen') return new InvalidExpression();
+  if (tokens[parsedTokensCount + 1]?.type !== 'RParen') return InvalidExpression();
 
   return {
     expression,
     parsedTokensCount: parsedTokensCount + 2,
   };
 };
-
-/*
-型 '(tokens: Tokens) => InvalidArguments | { args: (Literal | Variable | FuncCall | AddSubMulDiv)[]; parsedTokensCount: number; }' を型 'ParseCommaSeparatedExpressions' に割り当てることはできません。
-  型 'InvalidArguments | { args: (Literal | Variable | FuncCall | AddSubMulDiv)[]; parsedTokensCount: number; }' を型 'InvalidArguments | { args: Expression[]; parsedTokensCount: number; }' に割り当てることはできません。
-    型 '{ args: (Literal | Variable | FuncCall | AddSubMulDiv)[]; parsedTokensCount: number; }' を型 'InvalidArguments | { args: Expression[]; parsedTokensCount: number; }' に割り当てることはできません。
-      型 '{ args: (Literal | Variable | FuncCall | AddSubMulDiv)[]; parsedTokensCount: number; }' を型 '{ args: Expression[]; parsedTokensCount: number; }' に割り当てることはできません。
-        プロパティ 'args' の型に互換性がありません。
-          型 '(Literal | Variable | FuncCall | AddSubMulDiv)[]' を型 'Expression[]' に割り当てることはできません。
-            型 'Literal | Variable | FuncCall | AddSubMulDiv' を型 'Expression' に割り当てることはできません。
-              型 'IntLiteral' には 型 'Expression' からの次のプロパティがありません: expression, parsedTokensCountts(2322)
-*/
 
 // 主に関数の引数処理
 const parseCommaSeparatedExpressions: ParseCommaSeparatedExpressions = (tokens) => {
@@ -159,7 +144,7 @@ function parseUnaryOperator(tokens) {
 
 const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
   // 関数ではないので括弧の式がないか処理して返す
-  if (tokens[0].type !== 'Ident' || tokens[1]?.type !== 'LParen') {
+  if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'LParen') {
     return parseParenthesisExpression(tokens);
   }
 
@@ -167,11 +152,11 @@ const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
   // 引数を処理、スライスは括弧の中身を参照するため
   const argsAndParsedTokensCount = parseCommaSeparatedExpressions(tokens.slice(2));
   // 無効な式配列なので無効な式を返す
-  if (!argsAndParsedTokensCount.args) return new InvalidExpression();
+  if (!argsAndParsedTokensCount.args) return InvalidExpression();
 
   const { args, parsedTokensCount } = argsAndParsedTokensCount;
   // 引数の閉じ括弧が無いので無効な式を返す
-  if (tokens[parsedTokensCount + 2]?.type !== 'RParen') return new InvalidExpression();
+  if (tokens[parsedTokensCount + 2]?.type !== 'RParen') return InvalidExpression();
 
   return {
     expression: {
@@ -185,13 +170,13 @@ const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
 
 const parseMulDivExpression: ParseMulDivExpression = (tokens) => {
   const firstExpression = parseFunctionCallExpression(tokens);
-  if (!firstExpression.expression) return new InvalidExpression();
+  if (!firstExpression.expression) return InvalidExpression();
 
   let { expression: left, parsedTokensCount: readPosition } = firstExpression;
 
   while (tokens[readPosition]?.type === 'Asterisk') {
     const nextExpression = parseFunctionCallExpression(tokens.slice(readPosition + 1));
-    if (!nextExpression.expression) return new InvalidExpression();
+    if (!nextExpression.expression) return InvalidExpression();
 
     const { expression: right, parsedTokensCount: rightTokensCount } = nextExpression;
 
@@ -203,13 +188,13 @@ const parseMulDivExpression: ParseMulDivExpression = (tokens) => {
 
 const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
   const firstExpression = parseMulDivExpression(tokens);
-  if (!firstExpression.expression) return new InvalidExpression();
+  if (!firstExpression.expression) return InvalidExpression();
 
   let { expression: left, parsedTokensCount: readPosition } = firstExpression;
 
   while (tokens[readPosition]?.type === 'Plus') {
     const nextExpression = parseMulDivExpression(tokens.slice(readPosition + 1));
-    if (!nextExpression.expression) return new InvalidExpression();
+    if (!nextExpression.expression) return InvalidExpression();
 
     const { expression: right, parsedTokensCount: rightTokensCount } = nextExpression;
 

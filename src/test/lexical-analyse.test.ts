@@ -1,76 +1,138 @@
 /* eslint-disable no-undef */
 
 import lexicalAnalyse from '../modules/lexical-analyse';
+import { Tokens } from '../types/tokenTypes';
 
-describe('字句解析', () => {
-  test('空文字列', () => {
-    expect(lexicalAnalyse('')).toStrictEqual([]);
-  });
-  test('1', () => {
-    expect(lexicalAnalyse('1')).toStrictEqual([{ type: 'Int', value: 1 }]);
-  });
-  test('123', () => {
-    expect(lexicalAnalyse('123')).toStrictEqual([{ type: 'Int', value: 123 }]);
-  });
-  test('+', () => {
-    expect(lexicalAnalyse('+')).toStrictEqual([{ type: 'Plus' }]);
-  });
-  test('=', () => {
-    expect(lexicalAnalyse('=')).toStrictEqual([{ type: 'Equal' }]);
-  });
-  test('1+2', () => {
-    expect(lexicalAnalyse('1+2')).toStrictEqual([
+type TestCase = {
+  testName: string,
+  input: string,
+  output: Tokens
+}[]
+
+const testCase: TestCase = [
+  {
+    testName: '空文字列',
+    input: '',
+    output: [],
+  },
+  {
+    testName: '1',
+    input: '1',
+    output: [{ type: 'Int', value: 1 }],
+  },
+  {
+    testName: '123',
+    input: '123',
+    output: [{ type: 'Int', value: 123 }],
+  },
+  {
+    testName: '+',
+    input: '+',
+    output: [{ type: 'Plus' }],
+  },
+  {
+    testName: '=',
+    input: '=',
+    output: [{ type: 'Equal' }],
+  },
+  {
+    testName: '1+2',
+    input: '1+2',
+    output: [
       { type: 'Int', value: 1 },
       { type: 'Plus' },
-      { type: 'Int', value: 2 }]);
-  });
-  test('空白は無視する', () => {
-    expect(lexicalAnalyse('\t 1 ')).toStrictEqual([{ type: 'Int', value: 1 }]);
-    expect(lexicalAnalyse('     ')).toStrictEqual([]);
-    expect(lexicalAnalyse('1\n2')).toStrictEqual([
+      { type: 'Int', value: 2 },
+    ],
+  },
+  {
+    testName: '空白は無視する1',
+    input: '\t 1 ',
+    output: [{ type: 'Int', value: 1 }],
+  },
+  {
+    testName: '空白は無視する2',
+    input: '     ',
+    output: [],
+  },
+
+  {
+    testName: '空白は無視する3',
+    input: '1\n2',
+    output: [
       { type: 'Int', value: 1 },
-      { type: 'Int', value: 2 }]);
-  });
-  test('無効な文字列', () => {
-    expect(lexicalAnalyse('あ')).toStrictEqual([{ type: 'UnknownCharacter', value: 'あ' }]);
-  });
-  test('識別子', () => {
-    expect(lexicalAnalyse('test abc')).toStrictEqual([
-      { type: 'Ident', value: 'test' },
-      { type: 'Ident', value: 'abc' },
-    ]);
-  });
-  test('丸括弧', () => {
-    expect(lexicalAnalyse('()')).toStrictEqual([
+      { type: 'Int', value: 2 },
+    ],
+  },
+  {
+    testName: '無効な文字列',
+    input: 'あ',
+    output: [{ type: 'UnknownCharacter', value: 'あ' }],
+  },
+  {
+    testName: '識別子',
+    input: 'test abc',
+    output: [
+      { type: 'Ident', name: 'test' },
+      { type: 'Ident', name: 'abc' },
+    ],
+  },
+  {
+    testName: '丸括弧',
+    input: '()',
+    output: [
       { type: 'LParen' },
       { type: 'RParen' },
-    ]);
-  });
-  test('波括弧', () => {
-    expect(lexicalAnalyse('{}')).toStrictEqual([
+    ],
+  },
+  {
+    testName: '波括弧',
+    input: '{}',
+    output: [
       { type: 'LBrace' },
       { type: 'RBrace' },
-    ]);
-  });
-  test('コンマ', () => {
-    expect(lexicalAnalyse(',')).toStrictEqual([{ type: 'Comma' }]);
-  });
-  test('セミコロン', () => {
-    expect(lexicalAnalyse(';')).toStrictEqual([{ type: 'Semicolon' }]);
-  });
-  describe('キーワード', () => {
-    expect(lexicalAnalyse('if def')).toStrictEqual([
-      { type: 'If' },
-      { type: 'Def' },
-    ]);
-    test('真偽値', () => {
-      expect(lexicalAnalyse('true false')).toStrictEqual([
-        { type: 'Bool', value: true },
-        { type: 'Bool', value: false },
-      ]);
-    });
-    test('null', () => {
-      expect(lexicalAnalyse('null')).toStrictEqual([{ type: 'Null' }]);
+    ],
+  },
+  {
+    testName: 'コンマ',
+    input: ',',
+    output: [{ type: 'Comma' }],
+  },
+  {
+    testName: 'セミコロン',
+    input: ';',
+    output: [{ type: 'Semicolon' }],
+  },
+  {
+    testName: 'Ifキーワード',
+    input: 'if',
+    output: [{ type: 'If' }],
+  },
+  {
+    testName: 'def',
+    input: 'def',
+    output: [{ type: 'Def' }],
+  },
+  {
+    testName: 'false',
+    input: 'false',
+    output: [{ type: 'Bool', value: false }],
+  },
+  {
+    testName: 'true',
+    input: 'true',
+    output: [{ type: 'Bool', value: true }],
+  },
+  {
+    testName: 'null',
+    input: 'null',
+    output: [{ type: 'Null' }],
+  },
+];
+
+describe('字句解析', () => {
+  testCase.forEach((value) => {
+    test(value.testName, () => {
+      expect(lexicalAnalyse(value.input)).toStrictEqual(value.output);
     });
   });
 });

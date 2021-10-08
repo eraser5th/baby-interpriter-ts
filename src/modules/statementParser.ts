@@ -4,7 +4,6 @@
 
 import parseExpression from './expressionParser';
 import {
-  // Statement & Assignment
   ParseAssignment,
   ParseBlock,
   ParseCommaSeparatedIdentifiers,
@@ -25,6 +24,7 @@ class InvalidStatements {
     this.parsedTokensCount = undefined;
   }
 }
+
 class InvalidStatement {
   statement: null
 
@@ -71,25 +71,30 @@ class InvalidDefineFunction {
 
 const parseBlock: ParseBlock = (tokens) => {
   // Blockでは無いので無効な文配列を返す
-  if (tokens[0]?.type !== 'LBrace') return new InvalidStatements();
+  if (tokens[0]?.type !== 'LBrace') {
+    return new InvalidStatements();
+  }
   const statements: Statement[] = [];
   let readPosition = 1;
   while (tokens[readPosition]?.type !== 'RBrace') {
     // 閉じ括弧がなかったので無効な文配列を返す
-    if (!tokens[readPosition]) return new InvalidStatements();
+    if (!tokens[readPosition]) {
+      return new InvalidStatements();
+    }
     const {
       statement: stmt,
       parsedTokensCount,
     } = parseStatement(tokens.slice(readPosition));
     // 無効な文なので無効な文配列を返す
-    if (!stmt || !parsedTokensCount) return new InvalidStatements();
+    if (!stmt || !parsedTokensCount) {
+      return new InvalidStatements();
+    }
 
     statements.push(stmt);
     readPosition += parsedTokensCount;
   }
   return {
     statements,
-    // Todo 足すべき数が間違っている
     parsedTokensCount: readPosition + 2,
   };
 };
@@ -104,10 +109,13 @@ const parseIfStatement: ParseIfStatement = (tokens) => {
     expression: condition,
     parsedTokensCount: parsedExpressionTokensCount,
   } = parseExpression(tokens.slice(2));
-  if (!condition || !parsedExpressionTokensCount) return new InvalidIfStatement();
+  if (!condition || !parsedExpressionTokensCount) {
+    return new InvalidIfStatement();
+  }
   if (tokens[parsedExpressionTokensCount + 2]?.type !== 'RParen') {
     return new InvalidIfStatement();
   }
+
   const {
     statements,
     parsedTokensCount: parsedBlockTokensCount,
@@ -126,9 +134,13 @@ const parseIfStatement: ParseIfStatement = (tokens) => {
 };
 
 const parseAssignment: ParseAssignment = (tokens) => {
-  if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'Equal') return new InvalidAssignment();
+  if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'Equal') {
+    return new InvalidAssignment();
+  }
   const { expression, parsedTokensCount } = parseExpression(tokens.slice(2));
-  if (!expression || !parsedTokensCount) return new InvalidAssignment();
+  if (!expression || !parsedTokensCount) {
+    return new InvalidAssignment();
+  }
   return {
     assignment: {
       type: 'Assignment',
@@ -141,21 +153,27 @@ const parseAssignment: ParseAssignment = (tokens) => {
 
 const parseStatement: ParseStatement = (tokens) => {
   const { expression, parsedTokensCount: parsedExpressionTokensCount } = parseExpression(tokens);
-  if (!expression || !parsedExpressionTokensCount) return new InvalidStatement();
+  if (!expression || !parsedExpressionTokensCount) {
+    return new InvalidStatement();
+  }
   if (expression && tokens[parsedExpressionTokensCount]?.type === 'Semicolon') {
     return {
       statement: expression,
       parsedTokensCount: parsedExpressionTokensCount + 1,
     };
   }
+
   const { assignment, parsedTokensCount: parsedAssignmentTokensCount } = parseAssignment(tokens);
-  if (!expression || !parsedAssignmentTokensCount) return new InvalidStatement();
+  if (!expression || !parsedAssignmentTokensCount) {
+    return new InvalidStatement();
+  }
   if (assignment && tokens[parsedAssignmentTokensCount]?.type === 'Semicolon') {
     return {
       statement: assignment,
       parsedTokensCount: parsedAssignmentTokensCount + 1,
     };
   }
+
   const { ifStatement, parsedTokensCount: parsedIfTokensCount } = parseIfStatement(tokens);
   if (ifStatement && parsedIfTokensCount) {
     return {
@@ -163,6 +181,7 @@ const parseStatement: ParseStatement = (tokens) => {
       parsedTokensCount: parsedIfTokensCount,
     };
   }
+
   return new InvalidStatement();
 };
 
@@ -203,6 +222,7 @@ const parseDefineFunction: ParseDefineFunction = (tokens) => {
   if (tokens[parsedArgumentTokensCount + 3]?.type !== 'RParen') {
     return new InvalidDefineFunction();
   }
+
   const {
     statements,
     parsedTokensCount: parsedBlockTokensCount,
@@ -234,6 +254,7 @@ const parseSource: ParseSource = (tokens) => {
       readPosition += parsedExpressionTokensCount;
       continue;
     }
+
     const {
       defineFunction,
       parsedTokensCount: parsedDefineFunctionTokensCount,
@@ -243,6 +264,7 @@ const parseSource: ParseSource = (tokens) => {
       readPosition += parsedDefineFunctionTokensCount;
       continue;
     }
+
     return {
       type: 'SyntaxError',
       message: `予期しないトークン\`${tokens[readPosition]?.type}\`が渡されました`,

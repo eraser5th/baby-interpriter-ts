@@ -5,7 +5,7 @@ import prompts from 'prompts';
 import { Token } from './types/tokenTypes';
 import { emptyEnvironment } from './modules/value';
 import lexicalAnalyse from './modules/lexical-analyse';
-import parseSource from './modules/statementAndAssignmentParser';
+import parseSource from './modules/statementParser';
 import evaluate from './modules/evaluator';
 
 async function read() {
