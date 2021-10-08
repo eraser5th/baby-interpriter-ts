@@ -5,7 +5,7 @@ import {
 } from './valueTypes';
 import {
   DefineFunction, IfStatement, Source, Statement,
-} from './statementAssignmentTypes';
+} from './statementTypes';
 import { AddSubMulDiv } from './expressionTypes';
 
 type EvaluatorErrorResult = {

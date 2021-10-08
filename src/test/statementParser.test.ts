@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import parseSource from '../modules/statementParser';
-import { Source, SyntaxError } from '../types/statementAssignmentTypes';
+import { Source, SyntaxError } from '../types/statementTypes';
 import { Tokens } from '../types/tokenTypes';
 
 type TestCase = {
