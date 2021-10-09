@@ -81,7 +81,6 @@ const parseParenthesisExpression: ParseParenthesisExpression = (tokens) => {
   if (!parsedExpression.expression) return InvalidExpression();
 
   const { expression, parsedTokensCount } = parsedExpression;
-  console.log('tokens:', tokens, ' parsedTokensCount:', parsedTokensCount);
   // 閉じ括弧が存在しないので無効な式を返す
   if (tokens[parsedTokensCount + 1]?.type !== 'RParen') return InvalidExpression();
 
@@ -143,7 +142,6 @@ const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
     return parseParenthesisExpression(tokens);
   }
 
-  const name = tokens[0];
   // 引数を処理、スライスは括弧の中身を参照するため
   const argsAndParsedTokensCount = parseCommaSeparatedExpressions(tokens.slice(2));
   // 無効な式配列なので無効な式を返す
@@ -156,7 +154,7 @@ const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
   return {
     expression: {
       type: 'FuncCall',
-      name: name.name,
+      name: tokens[0].name,
       arguments: args,
     },
     parsedTokensCount: parsedTokensCount + 3,

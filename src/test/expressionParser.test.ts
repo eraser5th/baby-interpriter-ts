@@ -633,7 +633,6 @@ describe('構文解析(式)', () => {
     describe(expressionTest.name, () => {
       expressionTest.testCases.forEach((testCase) => {
         test(testCase.name, () => {
-          // (a())a()
           expect(parseExpression(testCase.input)).toStrictEqual(testCase.output);
         });
       });
