@@ -14,6 +14,7 @@ import {
   EvaluateAdd,
   Evaluate,
   EvaluatePartsOfSource,
+  EvaluateAssignment,
 } from '../types/evaluatorTypes';
 import { BoolValue, IntValue, NullValue } from '../types/valueTypes';
 
@@ -96,22 +97,28 @@ const evaluateAdd: EvaluateAdd = (ast, environment) => {
   };
 };
 
+const evaluateAssignment: EvaluateAssignment = (ast, environment) => {
+  const evalResult = evaluate(ast.expression, environment);
+  if (evalResult.isError) return evalResult;
+  return {
+    result: nullValue,
+    isError: false,
+    environment: {
+      variables: new Map(environment.variables).set(
+        ast.name,
+        evalResult.result,
+      ),
+      functions: environment.functions,
+    },
+  };
+};
+
 const evaluate: Evaluate = (ast, environment) => {
   switch (ast.type) {
     case 'Source':
       return evaluatePartsOfSource(ast.partsOfSource, environment);
     case 'Assignment':
-      return {
-        result: nullValue,
-        isError: false,
-        environment: {
-          variables: new Map(environment.variables).set(
-            ast.name,
-            evaluate(ast.expression, environment).result,
-          ),
-          functions: environment.functions,
-        },
-      };
+      return evaluateAssignment(ast, environment);
     case 'If':
       return evaluateIfStatement(ast, environment);
     case 'Add':

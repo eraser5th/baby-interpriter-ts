@@ -4,16 +4,17 @@ import {
   BoolValue, Environment, IntValue, NullValue,
 } from './valueTypes';
 import {
+  Assignment,
   DefineFunction, IfStatement, Source, Statement,
 } from './statementTypes';
 import { AddSubMulDiv } from './expressionTypes';
 
-type EvaluatorErrorResult = {
+export type EvaluatorErrorResult = {
     type: 'EvaluatorError',
     message: string
 }
 
-type EvaluatorErrorResponse = {
+export type EvaluatorErrorResponse = {
     result: EvaluatorErrorResult,
     environment: Environment,
     isError: true,
@@ -24,12 +25,12 @@ export type EvaluatorError = (
     environment: Environment
 ) => EvaluatorErrorResponse
 
-type TypeErrorResult = {
+export type TypeErrorResult = {
     type: 'TypeError',
     message: string,
 }
 
-type TypeErrorResponse = {
+export type TypeErrorResponse = {
     result: TypeErrorResult,
     environment: Environment,
     isError: true,
@@ -63,6 +64,12 @@ export type EvaluateAdd = (
     result: IntValue,
     isError: false,
     environment: Environment
+} | TypeErrorResponse | EvaluatorErrorResponse
+
+export type EvaluateAssignment = (ast: Assignment, environment: Environment) => {
+    result: NullValue,
+    environment: Environment
+    isError: false,
 } | TypeErrorResponse | EvaluatorErrorResponse
 
 export type Evaluate = (
