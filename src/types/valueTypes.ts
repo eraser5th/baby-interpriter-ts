@@ -17,5 +17,5 @@ export type Environment = {
     variables: Map<string,
         NullValue | IntValue | BoolValue
     >,
-    functions: Map<any, any>
+    functions: Map<string, any>
 }

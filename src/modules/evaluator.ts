@@ -58,6 +58,7 @@ const evaluatePartsOfSource: EvaluatePartsOfSource = (statements, environment) =
     isError: false,
     environment: env,
   };
+
   return res;
 };
 
@@ -78,11 +79,16 @@ const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
 };
 
 const evaluateAdd: EvaluateAdd = (ast, environment) => {
+  // 左の値を取得
   const leftEvalRes = evaluate(ast.left, environment);
-  if (leftEvalRes.isError) return leftEvalRes;
+  if (leftEvalRes.isError) {
+    return leftEvalRes;
+  }
   if (leftEvalRes.result.type !== 'IntValue') {
     return typeError(leftEvalRes.result.type, leftEvalRes.environment);
   }
+
+  // 右の値を取得
   const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
   if (rightEvalRes.isError) {
     return rightEvalRes;
@@ -90,6 +96,8 @@ const evaluateAdd: EvaluateAdd = (ast, environment) => {
   if (rightEvalRes.result.type !== 'IntValue') {
     return typeError(rightEvalRes.result.type, environment);
   }
+
+  // 正常な結果を返却
   return {
     result: intValue(leftEvalRes.result.value + rightEvalRes.result.value),
     isError: false,
