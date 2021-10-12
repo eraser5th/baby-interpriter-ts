@@ -167,6 +167,11 @@ const testCase: TestCase = [
     ],
   },
   {
+    testName: '-',
+    input: '-',
+    output: [{ type: 'Minus' }],
+  },
+  {
     testName: '(a()))*b()))',
     input: '(a()))*b()))',
     output: [
