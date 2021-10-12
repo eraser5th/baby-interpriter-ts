@@ -47,9 +47,6 @@ const evaluatePartsOfSource: EvaluatePartsOfSource = (statements, environment) =
     if (evalResult.isError) {
       return evalResult;
     }
-    if (evalResult === null) {
-      return evaluatorError(stmt.type, env);
-    }
     result = evalResult.result;
     env = evalResult.environment;
   }
