@@ -19,16 +19,10 @@ const InvalidExpression = () => ({
   parsedTokensCount: undefined,
 });
 
-class InvalidArguments {
-  args: null
-
-  parsedTokensCount: undefined
-
-  constructor() {
-    this.args = null;
-    this.parsedTokensCount = undefined;
-  }
-}
+const InvalidArguments = () => ({
+  args: null,
+  parsedTokensCount: undefined,
+});
 
 const parseLiteral: ParseLiteral = (tokens) => {
   if (tokens.length === 0) {
@@ -79,15 +73,11 @@ const parseValue: ParseValue = (tokens) => {
 };
 
 const parseParenthesisExpression: ParseParenthesisExpression = (tokens) => {
-  // 括弧がないからバリューを返す
   if (tokens[0]?.type !== 'LParen') return parseValue(tokens);
-  // 括弧の中身を式にする
   const parsedExpression = parseExpression(tokens.slice(1));
-  // 式が無効なので無効な式を返す
   if (!parsedExpression.expression) return InvalidExpression();
 
   const { expression, parsedTokensCount } = parsedExpression;
-  // 閉じ括弧が存在しないので無効な式を返す
   if (tokens[parsedTokensCount + 1]?.type !== 'RParen') return InvalidExpression();
 
   return {
@@ -113,7 +103,7 @@ const parseCommaSeparatedExpressions: ParseCommaSeparatedExpressions = (tokens) 
   while (tokens[readPosition]?.type === 'Comma') {
     readPosition += 1;
     const { expression, parsedTokensCount } = parseExpression(tokens.slice(readPosition));
-    if (!expression || !parsedTokensCount) return new InvalidArguments();
+    if (!expression || !parsedTokensCount) return InvalidArguments();
     args.push(expression);
     readPosition += parsedTokensCount;
   }
@@ -143,25 +133,20 @@ function parseUnaryOperator(tokens) {
 */
 
 const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
-  // 関数ではないので括弧の式がないか処理して返す
   if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'LParen') {
     return parseParenthesisExpression(tokens);
   }
 
-  const name = tokens[0];
-  // 引数を処理、スライスは括弧の中身を参照するため
   const argsAndParsedTokensCount = parseCommaSeparatedExpressions(tokens.slice(2));
-  // 無効な式配列なので無効な式を返す
   if (!argsAndParsedTokensCount.args) return InvalidExpression();
 
   const { args, parsedTokensCount } = argsAndParsedTokensCount;
-  // 引数の閉じ括弧が無いので無効な式を返す
   if (tokens[parsedTokensCount + 2]?.type !== 'RParen') return InvalidExpression();
 
   return {
     expression: {
       type: 'FuncCall',
-      name: name.name,
+      name: tokens[0].name,
       arguments: args,
     },
     parsedTokensCount: parsedTokensCount + 3,
@@ -205,5 +190,4 @@ const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
 };
 
 const parseExpression: ParseExpression = (tokens) => parseAddSubExpression(tokens);
-
 export default parseExpression;

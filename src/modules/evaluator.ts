@@ -14,6 +14,7 @@ import {
   EvaluateAdd,
   Evaluate,
   EvaluatePartsOfSource,
+  EvaluateAssignment,
 } from '../types/evaluatorTypes';
 import { BoolValue, IntValue, NullValue } from '../types/valueTypes';
 
@@ -46,9 +47,6 @@ const evaluatePartsOfSource: EvaluatePartsOfSource = (statements, environment) =
     if (evalResult.isError) {
       return evalResult;
     }
-    if (evalResult === null) {
-      return evaluatorError(stmt.type, env);
-    }
     result = evalResult.result;
     env = evalResult.environment;
   }
@@ -57,6 +55,7 @@ const evaluatePartsOfSource: EvaluatePartsOfSource = (statements, environment) =
     isError: false,
     environment: env,
   };
+
   return res;
 };
 
@@ -77,11 +76,16 @@ const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
 };
 
 const evaluateAdd: EvaluateAdd = (ast, environment) => {
+  // 左の値を取得
   const leftEvalRes = evaluate(ast.left, environment);
-  if (leftEvalRes.isError) return leftEvalRes;
+  if (leftEvalRes.isError) {
+    return leftEvalRes;
+  }
   if (leftEvalRes.result.type !== 'IntValue') {
     return typeError(leftEvalRes.result.type, leftEvalRes.environment);
   }
+
+  // 右の値を取得
   const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
   if (rightEvalRes.isError) {
     return rightEvalRes;
@@ -89,10 +93,28 @@ const evaluateAdd: EvaluateAdd = (ast, environment) => {
   if (rightEvalRes.result.type !== 'IntValue') {
     return typeError(rightEvalRes.result.type, environment);
   }
+
+  // 正常な結果を返却
   return {
     result: intValue(leftEvalRes.result.value + rightEvalRes.result.value),
     isError: false,
     environment: rightEvalRes.environment,
+  };
+};
+
+const evaluateAssignment: EvaluateAssignment = (ast, environment) => {
+  const evalResult = evaluate(ast.expression, environment);
+  if (evalResult.isError) return evalResult;
+  return {
+    result: nullValue,
+    isError: false,
+    environment: {
+      variables: new Map(environment.variables).set(
+        ast.name,
+        evalResult.result,
+      ),
+      functions: environment.functions,
+    },
   };
 };
 
@@ -101,17 +123,7 @@ const evaluate: Evaluate = (ast, environment) => {
     case 'Source':
       return evaluatePartsOfSource(ast.partsOfSource, environment);
     case 'Assignment':
-      return {
-        result: nullValue,
-        isError: false,
-        environment: {
-          variables: new Map(environment.variables).set(
-            ast.name,
-            evaluate(ast.expression, environment).result,
-          ),
-          functions: environment.functions,
-        },
-      };
+      return evaluateAssignment(ast, environment);
     case 'If':
       return evaluateIfStatement(ast, environment);
     case 'Add':
