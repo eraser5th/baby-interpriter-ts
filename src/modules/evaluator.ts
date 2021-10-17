@@ -9,14 +9,26 @@ import {
 import {
   EvaluatorError,
   TypeError,
-  ValueResponse,
   EvaluateIfStatement,
   EvaluateAdd,
   Evaluate,
   EvaluatePartsOfSource,
   EvaluateAssignment,
+  ArgumentsCountError,
+  UndefinedFunctionError,
+  UnwrapObject,
+  WrapObject,
+  EvaluateArguments,
+  EvaluateEmbeddedFunction,
+  EvaluateDefinedFunction,
+  ComputeFunction,
+  EvaluateFunctionCalling,
+  EvaluateFunctionDefinition,
+  Func,
 } from '../types/evaluatorTypes';
-import { BoolValue, IntValue, NullValue } from '../types/valueTypes';
+import {
+  BoolValue, IntValue, NullValue,
+} from '../types/valueTypes';
 
 const evaluatorError: EvaluatorError = (type, environment) => ({
   result: {
@@ -36,27 +48,43 @@ const typeError: TypeError = (type, environment) => ({
   environment,
 });
 
-const evaluatePartsOfSource: EvaluatePartsOfSource = (statements, environment) => {
+const argumentsCountError: ArgumentsCountError = (name, want, got, environment) => ({
+  result: {
+    type: 'ArgumentsCountError',
+    message: `関数'${name}'は${want}個の引数を取りますが、渡されたのは${got}個です`,
+  },
+  isError: true,
+  environment,
+});
+
+const undefinedFunctionError: UndefinedFunctionError = (name, environment) => ({
+  result: {
+    type: 'UndefinedFunctionError',
+    message: `関数'${name}'は存在しません`,
+  },
+  isError: true,
+  environment,
+});
+
+const evaluatePartsOfSource: EvaluatePartsOfSource = (partsOfSource, environment) => {
   let result: IntValue | BoolValue | NullValue = nullValue;
   let env = environment;
   // forEachではreturnを使って値を返せないので書きづらく、
   // またreduceでは条件分岐が複雑になり書きづらいので、for文を使って処理しています
   // eslint-disable-next-line no-restricted-syntax
-  for (const stmt of statements) {
-    const evalResult = evaluate(stmt, env);
+  for (const part of partsOfSource) {
+    const evalResult = evaluate(part, env);
     if (evalResult.isError) {
       return evalResult;
     }
     result = evalResult.result;
     env = evalResult.environment;
   }
-  const res: ValueResponse = {
+  return {
     result,
     isError: false,
     environment: env,
   };
-
-  return res;
 };
 
 const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
@@ -102,6 +130,30 @@ const evaluateAdd: EvaluateAdd = (ast, environment) => {
   };
 };
 
+const unwrapObject: UnwrapObject = (obj) => {
+  switch (obj.type) {
+    case 'IntValue':
+    case 'BoolValue':
+      return obj.value;
+    case 'NullValue':
+      return null;
+    default:
+      return null;
+  }
+};
+
+const wrapObject: WrapObject = (obj) => {
+  const toStr = Object.prototype.toString;
+  switch (toStr.call(obj)) {
+    case '[object Number]':
+      return intValue(obj);
+    case '[object Boolean]':
+      return boolValue(obj);
+    default:
+      return nullValue;
+  }
+};
+
 const evaluateAssignment: EvaluateAssignment = (ast, environment) => {
   const evalResult = evaluate(ast.expression, environment);
   if (evalResult.isError) return evalResult;
@@ -118,16 +170,109 @@ const evaluateAssignment: EvaluateAssignment = (ast, environment) => {
   };
 };
 
+const evaluateArguments: EvaluateArguments = (args, environment) => {
+  const evaluatedArguments = [];
+  let argumentsEvaluatedEnvironment = environment;
+  // eslint-disable-next-line no-restricted-syntax
+  for (const stmt of args) {
+    const evalResult = evaluate(stmt, argumentsEvaluatedEnvironment);
+    if (evalResult.isError) {
+      return evalResult;
+    }
+    evaluatedArguments.push(evalResult.result);
+    argumentsEvaluatedEnvironment = evalResult.environment;
+  }
+
+  return {
+    evaluatedArguments,
+    isError: false,
+    environment: argumentsEvaluatedEnvironment,
+  };
+};
+
+const evaluateEmbeddedFunction: EvaluateEmbeddedFunction = (func, args) => wrapObject(
+  func.function(...args.map(unwrapObject)),
+);
+
+const evaluateDefinedFunction: EvaluateDefinedFunction = (func, args, env) => {
+  const variables = new Map();
+  func.arguments.forEach((arg, i) => {
+    variables.set(arg, args[i]);
+  });
+  return evaluatePartsOfSource(
+    func.statements,
+    {
+      variables,
+      functions: env.functions,
+    },
+  );
+};
+
+const computeFunction: ComputeFunction = (func, name, args, env) => {
+  if (func.type === 'EmbeddedFunction') {
+    return {
+      result: evaluateEmbeddedFunction(func, args),
+      isError: false,
+      environment: env,
+    };
+  }
+  return evaluateDefinedFunction(func, args, env);
+};
+
+const evaluateFunctionCalling: EvaluateFunctionCalling = (calling, environment) => {
+  const func: Func | undefined = environment.functions.get(calling.name);
+  if (func === undefined) {
+    return undefinedFunctionError(calling.name, environment);
+  }
+  const args = calling.arguments;
+  if (func.argumentsCount !== args.length) {
+    return argumentsCountError(
+      calling.name,
+      func.argumentsCount,
+      calling.arguments.length,
+      environment,
+    );
+  }
+  const evaluatedArgs = evaluateArguments(args, environment);
+  if (evaluatedArgs.isError) {
+    return evaluatedArgs;
+  }
+  return computeFunction(
+    func, calling.name, evaluatedArgs.evaluatedArguments, evaluatedArgs.environment,
+  );
+};
+
+const evaluateFunctionDefinition: EvaluateFunctionDefinition = (funcDef, environment) => ({
+  result: nullValue,
+  isError: false,
+  environment: {
+    variables: environment.variables,
+    functions: new Map(environment.functions).set(
+      funcDef.name,
+      {
+        type: 'DefinedFunction',
+        argumentsCount: funcDef.arguments.length,
+        arguments: funcDef.arguments,
+        statements: funcDef.statements,
+      },
+    ),
+  },
+});
+
 const evaluate: Evaluate = (ast, environment) => {
   switch (ast.type) {
     case 'Source':
       return evaluatePartsOfSource(ast.partsOfSource, environment);
+    case 'FuncDef':
+      return evaluateFunctionDefinition(ast, environment);
     case 'Assignment':
       return evaluateAssignment(ast, environment);
     case 'If':
       return evaluateIfStatement(ast, environment);
     case 'Add':
       return evaluateAdd(ast, environment);
+    case 'FuncCall':
+      return evaluateFunctionCalling(ast, environment);
     case 'Variable':
       return {
         result: environment.variables.get(ast.name) || nullValue,
