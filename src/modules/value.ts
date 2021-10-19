@@ -22,5 +22,9 @@ export const boolValue = (value: boolean): BoolValue => ({
 
 export const emptyEnvironment: Environment = {
   variables: new Map(),
-  functions: new Map(),
+  functions: new Map().set('print', {
+    type: 'EmbeddedFunction',
+    argumentsCount: 1,
+    function: console.log,
+  }),
 };
