@@ -1,4 +1,4 @@
-import { DefinedFunction, EmbeddedFunction } from './evaluatorTypes';
+import { Func } from './evaluatorTypes';
 
 export type NullValue = {
     type: 'NullValue',
@@ -19,5 +19,5 @@ export type Environment = {
     variables: Map<string,
         NullValue | IntValue | BoolValue
     >,
-    functions: Map<string, DefinedFunction | EmbeddedFunction>;
+    functions: Map<string, Func>;
 }
