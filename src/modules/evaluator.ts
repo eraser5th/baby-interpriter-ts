@@ -130,6 +130,87 @@ const evaluateAdd: EvaluateAdd = (ast, environment) => {
   };
 };
 
+const evaluateSub: EvaluateAdd = (ast, environment) => {
+  // 左の値を取得
+  const leftEvalRes = evaluate(ast.left, environment);
+  if (leftEvalRes.isError) {
+    return leftEvalRes;
+  }
+  if (leftEvalRes.result.type !== 'IntValue') {
+    return typeError(leftEvalRes.result.type, leftEvalRes.environment);
+  }
+
+  // 右の値を取得
+  const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
+  if (rightEvalRes.isError) {
+    return rightEvalRes;
+  }
+  if (rightEvalRes.result.type !== 'IntValue') {
+    return typeError(rightEvalRes.result.type, environment);
+  }
+
+  // 正常な結果を返却
+  return {
+    result: intValue(leftEvalRes.result.value - rightEvalRes.result.value),
+    isError: false,
+    environment: rightEvalRes.environment,
+  };
+};
+
+const evaluateMul: EvaluateAdd = (ast, environment) => {
+  // 左の値を取得
+  const leftEvalRes = evaluate(ast.left, environment);
+  if (leftEvalRes.isError) {
+    return leftEvalRes;
+  }
+  if (leftEvalRes.result.type !== 'IntValue') {
+    return typeError(leftEvalRes.result.type, leftEvalRes.environment);
+  }
+
+  // 右の値を取得
+  const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
+  if (rightEvalRes.isError) {
+    return rightEvalRes;
+  }
+  if (rightEvalRes.result.type !== 'IntValue') {
+    return typeError(rightEvalRes.result.type, environment);
+  }
+
+  // 正常な結果を返却
+  return {
+    result: intValue(leftEvalRes.result.value * rightEvalRes.result.value),
+    isError: false,
+    environment: rightEvalRes.environment,
+  };
+};
+
+const evaluateDiv: EvaluateAdd = (ast, environment) => {
+  // 左の値を取得
+  const leftEvalRes = evaluate(ast.left, environment);
+  if (leftEvalRes.isError) {
+    return leftEvalRes;
+  }
+  if (leftEvalRes.result.type !== 'IntValue') {
+    return typeError(leftEvalRes.result.type, leftEvalRes.environment);
+  }
+
+  // 右の値を取得
+  const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
+  if (rightEvalRes.isError) {
+    return rightEvalRes;
+  }
+  if (rightEvalRes.result.type !== 'IntValue') {
+    return typeError(rightEvalRes.result.type, environment);
+  }
+
+  // 正常な結果を返却
+  return {
+    result: intValue(leftEvalRes.result.value / rightEvalRes.result.value),
+    isError: false,
+    environment: rightEvalRes.environment,
+  };
+};
+
 const unwrapObject: UnwrapObject = (obj) => {
   switch (obj.type) {
     case 'IntValue':
@@ -271,6 +352,12 @@ const evaluate: Evaluate = (ast, environment) => {
       return evaluateIfStatement(ast, environment);
     case 'Add':
       return evaluateAdd(ast, environment);
+    case 'Sub':
+      return evaluateSub(ast, environment);
+    case 'Mul':
+      return evaluateMul(ast, environment);
+    case 'Div':
+      return evaluateDiv(ast, environment);
     case 'FuncCall':
       return evaluateFunctionCalling(ast, environment);
     case 'Variable':
