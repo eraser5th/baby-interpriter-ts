@@ -159,13 +159,17 @@ const parseMulDivExpression: ParseMulDivExpression = (tokens) => {
 
   let { expression: left, parsedTokensCount: readPosition } = firstExpression;
 
-  while (tokens[readPosition]?.type === 'Asterisk') {
+  while (tokens[readPosition]?.type === 'Asterisk' || tokens[readPosition]?.type === 'Slash') {
     const nextExpression = parseFunctionCallExpression(tokens.slice(readPosition + 1));
     if (!nextExpression.expression) return InvalidExpression();
 
     const { expression: right, parsedTokensCount: rightTokensCount } = nextExpression;
 
-    left = { type: 'Mul', left, right };
+    if (tokens[readPosition]?.type === 'Asterisk') {
+      left = { type: 'Mul', left, right };
+    } else {
+      left = { type: 'Div', left, right };
+    }
     readPosition += rightTokensCount + 1;
   }
   return { expression: left, parsedTokensCount: readPosition };
@@ -177,13 +181,17 @@ const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
 
   let { expression: left, parsedTokensCount: readPosition } = firstExpression;
 
-  while (tokens[readPosition]?.type === 'Plus') {
+  while (tokens[readPosition]?.type === 'Plus' || tokens[readPosition]?.type === 'Minus') {
     const nextExpression = parseMulDivExpression(tokens.slice(readPosition + 1));
     if (!nextExpression.expression) return InvalidExpression();
 
     const { expression: right, parsedTokensCount: rightTokensCount } = nextExpression;
 
-    left = { type: 'Add', left, right };
+    if (tokens[readPosition]?.type === 'Plus') {
+      left = { type: 'Add', left, right };
+    } else {
+      left = { type: 'Sub', left, right };
+    }
     readPosition += rightTokensCount + 1;
   }
   return { expression: left, parsedTokensCount: readPosition };
