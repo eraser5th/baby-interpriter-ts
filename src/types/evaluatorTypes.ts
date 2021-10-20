@@ -199,7 +199,11 @@ export type EvaluateAssignment = (
     isError: false,
 } | ErrorResponse
 
+type Dummy = {
+    type: 'Dummy',
+}
+
 export type Evaluate = (
-    ast: Statement | Source | DefineFunction,
+    ast: Statement | Source | DefineFunction | Dummy,
     environment: Environment
 ) => ValueResponse | ErrorResponse

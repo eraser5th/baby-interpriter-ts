@@ -1,6 +1,6 @@
 type Parens = 'LParen' | 'RParen'
 type Braces = 'LBrace' | 'RBrace'
-type Symbols = 'Asterisk' | 'Equal' | 'Plus' | 'Minus' | Parens | Braces | 'Comma' | 'Semicolon'
+type Symbols = 'Asterisk'| 'Slash' | 'Equal' | 'Plus' | 'Minus' | Parens | Braces | 'Comma' | 'Semicolon'
 type SymbolToken = { type: Symbols }
 type UnknownCharacterToken = {
     type: 'UnknownCharacter',

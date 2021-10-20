@@ -37,20 +37,24 @@ const lexicalAnalyse = (source: string): Tokens => {
   let readPosition = 0;
   while (readPosition < source.length) {
     switch (source[readPosition]) {
-      case '*':
-        tokens.push({ type: 'Asterisk' });
-        readPosition += 1;
-        break;
-      case '=':
-        tokens.push({ type: 'Equal' });
-        readPosition += 1;
-        break;
       case '+':
         tokens.push({ type: 'Plus' });
         readPosition += 1;
         break;
       case '-':
         tokens.push({ type: 'Minus' });
+        readPosition += 1;
+        break;
+      case '*':
+        tokens.push({ type: 'Asterisk' });
+        readPosition += 1;
+        break;
+      case '/':
+        tokens.push({ type: 'Slash' });
+        readPosition += 1;
+        break;
+      case '=':
+        tokens.push({ type: 'Equal' });
         readPosition += 1;
         break;
       case '(':
