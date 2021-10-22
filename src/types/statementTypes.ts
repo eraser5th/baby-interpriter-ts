@@ -19,15 +19,31 @@ export type ParseBlock = (tokens: Tokens) => {
 export type IfStatement = {
     type: 'If',
     condition: Expression,
-    statements: (Statement)[]
+    ifStatements: Statement[],
+    elseStatements: Statement[]
 }
 
-type InvalidIfStatement = {ifStatement: null, parsedTokensCount: undefined}
+type InvalidIfStatement = { ifStatement: null, parsedTokensCount: undefined }
 
 export type ParseIfStatement = (tokens: Tokens) => {
     ifStatement: IfStatement
     parsedTokensCount: number
 } | InvalidIfStatement
+
+export type ElseStatement = {
+    type: 'Else',
+    statements: Statement[]
+}
+
+export type ParseElseStatement = (tokens: Tokens) => {
+    elseStatement: ElseStatement,
+    isError: false,
+    parsedTokensCount: number,
+} | {
+    elseStatement: null,
+    isError: boolean,
+    parsedTokensCount: undefined,
+}
 
 export type Assignment = {
     type: 'Assignment',
