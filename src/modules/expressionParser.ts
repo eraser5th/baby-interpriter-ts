@@ -72,12 +72,13 @@ const parseValue: ParseValue = (tokens) => {
   return parseLiteral(tokens);
 };
 
+// 括弧も含んで処理
 const parseParenthesisExpression: ParseParenthesisExpression = (tokens) => {
   if (tokens[0]?.type !== 'LParen') return parseValue(tokens);
-  const parsedExpression = parseExpression(tokens.slice(1));
-  if (!parsedExpression.expression) return InvalidExpression();
 
-  const { expression, parsedTokensCount } = parsedExpression;
+  const { expression, parsedTokensCount } = parseExpression(tokens.slice(1));
+
+  if (!expression || !parsedTokensCount) return InvalidExpression();
   if (tokens[parsedTokensCount + 1]?.type !== 'RParen') return InvalidExpression();
 
   return {
