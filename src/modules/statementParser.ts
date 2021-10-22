@@ -126,7 +126,7 @@ const parseIfStatement: ParseIfStatement = (tokens) => {
       type: 'If',
       condition,
       ifStatements: statements,
-      elseStatements: [{ type: 'NullLiteral' }],
+      elseStatements: [],
     },
     parsedTokensCount: parsedExpressionTokensCount + parsedBlockTokensCount + 1,
   };

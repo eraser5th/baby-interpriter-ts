@@ -25,7 +25,8 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'BoolLiteral', value: true },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -39,7 +40,8 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'BoolLiteral', value: false },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -53,7 +55,8 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'IntLiteral', value: 1 },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -67,7 +70,8 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'Variable', name: 'a' },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -81,7 +85,8 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'FuncCall', name: 'a', arguments: [] },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -103,7 +108,8 @@ const ifStatement: TestCase[] = [
               { type: 'FuncCall', name: 'c', arguments: [] },
             ],
           },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -117,7 +123,8 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'BoolLiteral', value: true },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -131,7 +138,8 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'IntLiteral', value: 1 },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -145,7 +153,8 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'Variable', name: 'a' },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -159,7 +168,8 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'FuncCall', name: 'a', arguments: [] },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -181,7 +191,8 @@ const ifStatement: TestCase[] = [
               { type: 'FuncCall', name: 'c', arguments: [] },
             ],
           },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
@@ -195,9 +206,10 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'BoolLiteral', value: true },
-          statements: [
+          ifStatements: [
             { type: 'IntLiteral', value: 1 },
           ],
+          elseStatements: [],
         },
       ],
     },
@@ -211,11 +223,12 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'BoolLiteral', value: true },
-          statements: [{
+          ifStatements: [{
             type: 'Add',
             left: { type: 'IntLiteral', value: 1 },
             right: { type: 'IntLiteral', value: 2 },
           }],
+          elseStatements: [],
         },
       ],
     },
@@ -229,11 +242,12 @@ const ifStatement: TestCase[] = [
         {
           type: 'If',
           condition: { type: 'BoolLiteral', value: true },
-          statements: [{
+          ifStatements: [{
             type: 'Mul',
             left: { type: 'IntLiteral', value: 1 },
             right: { type: 'IntLiteral', value: 2 },
           }],
+          elseStatements: [],
         },
       ],
     },
@@ -259,7 +273,8 @@ const ifStatement: TestCase[] = [
               },
             },
           },
-          statements: [],
+          ifStatements: [],
+          elseStatements: [],
         },
       ],
     },
