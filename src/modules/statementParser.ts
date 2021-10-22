@@ -8,6 +8,7 @@ import {
   ParseBlock,
   ParseCommaSeparatedIdentifiers,
   ParseDefineFunction,
+  ParseElseStatement,
   ParseIfStatement,
   ParseSource,
   ParseStatement,
@@ -25,6 +26,7 @@ const InvalidAssignment = () => ({ assignment: null, parsedTokensCount: undefine
 const InvalidDefineFunction = () => ({ defineFunction: null, parsedTokensCount: undefined });
 
 const parseBlock: ParseBlock = (tokens) => {
+  // console.log('parseBlock', tokens);
   // Blockでは無いので無効な文配列を返す
   if (tokens[0]?.type !== 'LBrace') return InvalidStatements();
 
@@ -49,10 +51,11 @@ const parseBlock: ParseBlock = (tokens) => {
   // 正常な文配列を返却
   return {
     statements,
-    parsedTokensCount: readPosition + 2,
+    parsedTokensCount: readPosition + 1,
   };
 };
 
+/*
 const parseIfStatement: ParseIfStatement = (tokens) => {
   // If文でない
   if (tokens[0]?.type !== 'If') return InvalidIfStatement();
@@ -79,6 +82,98 @@ const parseIfStatement: ParseIfStatement = (tokens) => {
       statements,
     },
     parsedTokensCount: parsedExpressionTokensCount + parsedBlockTokensCount + 1,
+  };
+};
+*/
+
+const parseIfStatement: ParseIfStatement = (tokens) => {
+  if (tokens[0]?.type !== 'If') return InvalidIfStatement();
+
+  const {
+    expression: condition,
+    parsedTokensCount: parsedExpressionTokensCount,
+  } = parseExpression(tokens.slice(1));
+  if (!condition || !parsedExpressionTokensCount) return InvalidIfStatement();
+
+  const {
+    statements,
+    parsedTokensCount: parsedBlockTokensCount,
+  } = parseBlock(tokens.slice(parsedExpressionTokensCount + 1));
+  if (!statements || !parsedBlockTokensCount) return InvalidIfStatement();
+
+  const parsedElseStmt = parseElseStatement(
+    tokens.slice(parsedExpressionTokensCount + parsedBlockTokensCount + 1),
+  );
+  if (parsedElseStmt.isError) return InvalidIfStatement();
+
+  if (parsedElseStmt.elseStatement) {
+    return {
+      ifStatement: {
+        type: 'If',
+        condition,
+        ifStatements: statements,
+        elseStatements: parsedElseStmt.elseStatement.statements,
+      },
+      parsedTokensCount: parsedExpressionTokensCount
+      + parsedBlockTokensCount
+      + parsedElseStmt.parsedTokensCount
+      + 1,
+    };
+  }
+
+  return {
+    ifStatement: {
+      type: 'If',
+      condition,
+      ifStatements: statements,
+      elseStatements: [{ type: 'NullLiteral' }],
+    },
+    parsedTokensCount: parsedExpressionTokensCount + parsedBlockTokensCount + 1,
+  };
+};
+
+const parseElseStatement: ParseElseStatement = (tokens) => {
+  // console.log(tokens);
+  if (tokens[0]?.type !== 'Else') {
+    return {
+      elseStatement: null,
+      isError: false,
+      parsedTokensCount: undefined,
+    };
+  }
+
+  const { ifStatement, parsedTokensCount } = parseIfStatement(tokens.slice(1));
+  if (ifStatement && parsedTokensCount) {
+    return {
+      elseStatement: {
+        type: 'Else',
+        statements: [ifStatement],
+      },
+      isError: false,
+      parsedTokensCount: parsedTokensCount + 1,
+    };
+  }
+
+  const {
+    statements,
+    parsedTokensCount: blockTokensCount,
+  } = parseBlock(tokens.slice(1));
+  console.log(statements);
+  if (!statements || !blockTokensCount) {
+    return {
+      elseStatement: null,
+      isError: true,
+      parsedTokensCount: undefined,
+    };
+  }
+
+  return {
+    elseStatement: {
+      type: 'Else',
+      statements,
+    },
+    isError: false,
+    parsedTokensCount: blockTokensCount + 1,
   };
 };
 
@@ -110,7 +205,6 @@ const parseStatement: ParseStatement = (tokens) => {
       parsedTokensCount: parsedExpressionTokensCount + 1,
     };
   }
-
   // 代入文であるか検証
   const { assignment, parsedTokensCount: parsedAssignmentTokensCount } = parseAssignment(tokens);
   if (parsedAssignmentTokensCount && assignment && tokens[parsedAssignmentTokensCount]?.type === 'Semicolon') {
@@ -119,7 +213,6 @@ const parseStatement: ParseStatement = (tokens) => {
       parsedTokensCount: parsedAssignmentTokensCount + 1,
     };
   }
-
   // If文であるか検証
   const { ifStatement, parsedTokensCount: parsedIfTokensCount } = parseIfStatement(tokens);
   if (ifStatement && parsedIfTokensCount) {
@@ -128,7 +221,6 @@ const parseStatement: ParseStatement = (tokens) => {
       parsedTokensCount: parsedIfTokensCount,
     };
   }
-
   // どれでもないので無効な文を返す
   return InvalidStatement();
 };
@@ -145,7 +237,6 @@ const parseCommaSeparatedIdentifiers: ParseCommaSeparatedIdentifiers = (tokens) 
 
   const names = [head.name];
   let readPosition = 1;
-
   // 第一仮引数以降を取得
   while (tokens[readPosition]?.type === 'Comma') {
     readPosition += 1;
@@ -156,7 +247,6 @@ const parseCommaSeparatedIdentifiers: ParseCommaSeparatedIdentifiers = (tokens) 
     names.push(next.name);
     readPosition += 1;
   }
-
   // 仮引数たちを返却
   return {
     names,
