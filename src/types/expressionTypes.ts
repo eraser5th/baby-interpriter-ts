@@ -28,7 +28,12 @@ export type AddSubMulDiv = {
     right: Expression
 }
 
-export type Expression = Literal | Variable | FuncCall | AddSubMulDiv
+export type UnaryOperator = {
+    type: 'UnaryPlus' | 'UnaryMinus',
+    expression: Expression
+}
+
+export type Expression = Literal | Variable | FuncCall | AddSubMulDiv | UnaryOperator
 
 export type ExpressionWithTokensCount = {
     expression: Expression
@@ -61,6 +66,14 @@ export type ParseCommaSeparatedExpressions = (tokens: Tokens) => {
     args: (Expression | AddSubMulDiv | FuncCall | Literal | Variable)[],
     parsedTokensCount: number
 } | InvalidArguments
+
+export type ParseUnaryOperator = (tokens: Tokens) => {
+    expression: Expression,
+    parsedTokensCount: number
+} | {
+    expression: Literal | Variable;
+    parsedTokensCount: 1;
+} | InvalidExpression
 
 export type ParseFunctionCallExpression = (tokens: Tokens) => ExpressionWithTokensCount | InvalidExpression
 

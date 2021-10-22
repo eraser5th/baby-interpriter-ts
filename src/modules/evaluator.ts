@@ -25,6 +25,7 @@ import {
   EvaluateFunctionCalling,
   EvaluateFunctionDefinition,
   Func,
+  EvaluateUnaryOperator,
 } from '../types/evaluatorTypes';
 import {
   BoolValue, IntValue, NullValue,
@@ -180,7 +181,6 @@ const evaluateMul: EvaluateAdd = (ast, environment) => {
   if (leftEvalRes.result.type !== 'IntValue') {
     return typeError(leftEvalRes.result.type, leftEvalRes.environment);
   }
-
   // 右の値を取得
   const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
   if (rightEvalRes.isError) {
@@ -189,7 +189,6 @@ const evaluateMul: EvaluateAdd = (ast, environment) => {
   if (rightEvalRes.result.type !== 'IntValue') {
     return typeError(rightEvalRes.result.type, environment);
   }
-
   // 正常な結果を返却
   return {
     result: intValue(leftEvalRes.result.value * rightEvalRes.result.value),
@@ -207,7 +206,6 @@ const evaluateDiv: EvaluateAdd = (ast, environment) => {
   if (leftEvalRes.result.type !== 'IntValue') {
     return typeError(leftEvalRes.result.type, leftEvalRes.environment);
   }
-
   // 右の値を取得
   const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
   if (rightEvalRes.isError) {
@@ -216,12 +214,34 @@ const evaluateDiv: EvaluateAdd = (ast, environment) => {
   if (rightEvalRes.result.type !== 'IntValue') {
     return typeError(rightEvalRes.result.type, environment);
   }
-
   // 正常な結果を返却
   return {
     result: intValue(leftEvalRes.result.value / rightEvalRes.result.value),
     isError: false,
     environment: rightEvalRes.environment,
+  };
+};
+
+const evaluateUnaryOperator: EvaluateUnaryOperator = (ast, environment) => {
+  const evalResult = evaluate(ast.expression, environment);
+  if (evalResult.isError) {
+    return evalResult;
+  }
+  if (evalResult.result.type !== 'IntValue') {
+    return typeError(evalResult.result.type, evalResult.environment);
+  }
+  if (ast.type === 'UnaryPlus') {
+    return {
+      result: intValue(evalResult.result.value),
+      isError: false,
+      environment: evalResult.environment,
+    };
+  }
+
+  return {
+    result: intValue(-evalResult.result.value),
+    isError: false,
+    environment: evalResult.environment,
   };
 };
 
@@ -372,6 +392,9 @@ const evaluate: Evaluate = (ast, environment) => {
       return evaluateMul(ast, environment);
     case 'Div':
       return evaluateDiv(ast, environment);
+    case 'UnaryMinus':
+    case 'UnaryPlus':
+      return evaluateUnaryOperator(ast, environment);
     case 'FuncCall':
       return evaluateFunctionCalling(ast, environment);
     case 'Variable':
