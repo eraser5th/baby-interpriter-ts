@@ -19,8 +19,9 @@ type BoolToken = {
     value: boolean
 }
 type IfToken = { type: 'If' }
+type ElseToken = { type: 'Else' }
 type DefToken = { type: 'Def' }
 type NullToken = { type: 'Null' }
-type KeywordToken = BoolToken | IfToken | DefToken | NullToken
+type KeywordToken = BoolToken | IfToken| ElseToken | DefToken | NullToken
 export type Token = SymbolToken | UnknownCharacterToken | IdentToken | IntToken | KeywordToken
 export type Tokens = Token[]
