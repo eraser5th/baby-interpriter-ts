@@ -99,32 +99,23 @@ const lexicalAnalyse = (source: string): Tokens => {
           const name = source.substring(readPosition, readPosition + identCharsCount);
           switch (name) {
             case 'if':
-              tokens.push({
-                type: 'If',
-              });
+              tokens.push({ type: 'If' });
+              break;
+            case 'else':
+              tokens.push({ type: 'Else' });
               break;
             case 'def':
-              tokens.push({
-                type: 'Def',
-              });
+              tokens.push({ type: 'Def' });
               break;
             case 'true':
             case 'false':
-              tokens.push({
-                type: 'Bool',
-                value: name === 'true',
-              });
+              tokens.push({ type: 'Bool', value: name === 'true' });
               break;
             case 'null':
-              tokens.push({
-                type: 'Null',
-              });
+              tokens.push({ type: 'Null' });
               break;
             default:
-              tokens.push({
-                type: 'Ident',
-                name,
-              });
+              tokens.push({ type: 'Ident', name });
           }
           readPosition += identCharsCount;
         } else {
