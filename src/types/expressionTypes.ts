@@ -33,7 +33,22 @@ export type UnaryOperator = {
     expression: Expression
 }
 
-export type Expression = Literal | Variable | FuncCall | AddSubMulDiv | UnaryOperator
+export type HighLevelCompare = {
+    type: 'HighLevelCompare',
+    kindOfCompare: '===' | '!==' | '<=' | '<',
+    left: Expression,
+    right: Expression
+}
+export type LowLevelCompare = {
+    type: 'LowLevelCompare',
+    kindOfCompare: '===' | '!==',
+    left: Expression,
+    right: Expression
+}
+
+export type Compare = HighLevelCompare | LowLevelCompare
+
+export type Expression = Literal | Variable | FuncCall | AddSubMulDiv | UnaryOperator | Compare
 
 export type ExpressionWithTokensCount = {
     expression: Expression
@@ -80,5 +95,15 @@ export type ParseFunctionCallExpression = (tokens: Tokens) => ExpressionWithToke
 export type ParseMulDivExpression = (tokens: Tokens) => ExpressionWithTokensCount | InvalidExpression
 
 export type ParseAddSubExpression = (tokens: Tokens) => ExpressionWithTokensCount | InvalidExpression
+
+export type ParseCompare = (tokens: Tokens) => {
+    expression: Expression,
+    parsedTokensCount: number,
+} | InvalidExpression
+
+export type ParseEqEqEq = (tokens: Tokens) => {
+    expression: Expression,
+    parsedTokensCount: number,
+} | InvalidExpression
 
 export type ParseExpression = (tokens: Tokens) => ExpressionWithTokensCount | InvalidExpression

@@ -26,6 +26,10 @@ import {
   EvaluateFunctionDefinition,
   Func,
   EvaluateUnaryOperator,
+  EvaluateLowLevelCompare,
+  ComputeHighLevelCompare,
+  EvaluateHighLevelCompare,
+  ComputeLowLevelCompare,
 } from '../types/evaluatorTypes';
 import {
   BoolValue, IntValue, NullValue,
@@ -374,6 +378,113 @@ const evaluateFunctionDefinition: EvaluateFunctionDefinition = (funcDef, environ
   },
 });
 
+const computeHighLevelCompare: ComputeHighLevelCompare = (ast, environment) => {
+  let leftEvalRes;
+  if (ast.left.type === 'HighLevelCompare') {
+    leftEvalRes = computeHighLevelCompare(ast.left, environment);
+  } else {
+    leftEvalRes = evaluate(ast.left, environment);
+  }
+  if (leftEvalRes.isError) return leftEvalRes;
+
+  const rightEvalRes = evaluate(ast.right, environment);
+  if (rightEvalRes.isError) return rightEvalRes;
+
+  // eslint-disable-next-line no-eval
+  let nextBoolValue: boolean = eval(`${leftEvalRes.result.value} ${ast.kindOfCompare} ${rightEvalRes.result.value}`);
+  if (leftEvalRes.result.type === 'CompareResult') {
+    nextBoolValue = leftEvalRes.result.boolValue && nextBoolValue;
+  }
+  return {
+    result: {
+      type: 'CompareResult',
+      boolValue: nextBoolValue,
+      value: rightEvalRes.result.value,
+    },
+    isError: false,
+    environment,
+  };
+};
+
+const evaluateHighLevelCompare: EvaluateHighLevelCompare = (ast, environment) => {
+  let leftEvalRes;
+  if (ast.left.type === 'HighLevelCompare') {
+    leftEvalRes = computeHighLevelCompare(ast.left, environment);
+  } else {
+    leftEvalRes = evaluate(ast.left, environment);
+  }
+  if (leftEvalRes.isError) return leftEvalRes;
+
+  const rightEvalRes = evaluate(ast.right, environment);
+  if (rightEvalRes.isError) return rightEvalRes;
+  // eslint-disable-next-line no-eval
+  let resultValue: boolean = eval(`${leftEvalRes.result.value} ${ast.kindOfCompare} ${rightEvalRes.result.value}`);
+  if (leftEvalRes.result.type === 'CompareResult') {
+    resultValue = leftEvalRes.result.boolValue && resultValue;
+  }
+  return {
+    result: {
+      type: 'BoolValue',
+      value: resultValue,
+    },
+    isError: false,
+    environment,
+  };
+};
+
+const computeLowLevelCompare: ComputeLowLevelCompare = (ast, environment) => {
+  let leftEvalRes;
+  if (ast.left.type === 'LowLevelCompare') {
+    leftEvalRes = computeLowLevelCompare(ast.left, environment);
+  } else {
+    leftEvalRes = evaluate(ast.left, environment);
+  }
+  if (leftEvalRes.isError) return leftEvalRes;
+
+  const rightEvalRes = evaluate(ast.right, environment);
+  if (rightEvalRes.isError) return rightEvalRes;
+  // eslint-disable-next-line no-eval
+  let nextBoolValue: boolean = eval(`${leftEvalRes.result.value} ${ast.kindOfCompare} ${rightEvalRes.result.value}`);
+  if (leftEvalRes.result.type === 'CompareResult') {
+    nextBoolValue = leftEvalRes.result.boolValue && nextBoolValue;
+  }
+  return {
+    result: {
+      type: 'CompareResult',
+      boolValue: nextBoolValue,
+      value: rightEvalRes.result.value,
+    },
+    isError: false,
+    environment,
+  };
+};
+
+const evaluateLowLevelCompare: EvaluateLowLevelCompare = (ast, environment) => {
+  let leftEvalRes;
+  if (ast.left.type === 'LowLevelCompare') {
+    leftEvalRes = computeLowLevelCompare(ast.left, environment);
+  } else {
+    leftEvalRes = evaluate(ast.left, environment);
+  }
+  if (leftEvalRes.isError) return leftEvalRes;
+
+  const rightEvalRes = evaluate(ast.right, environment);
+  if (rightEvalRes.isError) return rightEvalRes;
+  // eslint-disable-next-line no-eval
+  let resultValue: boolean = eval(`${leftEvalRes.result.value} ${ast.kindOfCompare} ${rightEvalRes.result.value}`);
+  if (leftEvalRes.result.type === 'CompareResult') {
+    resultValue = leftEvalRes.result.boolValue && resultValue;
+  }
+  return {
+    result: {
+      type: 'BoolValue',
+      value: resultValue,
+    },
+    isError: false,
+    environment,
+  };
+};
+
 const evaluate: Evaluate = (ast, environment) => {
   switch (ast.type) {
     case 'Source':
@@ -395,6 +506,10 @@ const evaluate: Evaluate = (ast, environment) => {
     case 'UnaryMinus':
     case 'UnaryPlus':
       return evaluateUnaryOperator(ast, environment);
+    case 'HighLevelCompare':
+      return evaluateHighLevelCompare(ast, environment);
+    case 'LowLevelCompare':
+      return evaluateLowLevelCompare(ast, environment);
     case 'FuncCall':
       return evaluateFunctionCalling(ast, environment);
     case 'Variable':

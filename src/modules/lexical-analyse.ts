@@ -54,8 +54,41 @@ const lexicalAnalyse = (source: string): Tokens => {
         readPosition += 1;
         break;
       case '=':
-        tokens.push({ type: 'Equal' });
-        readPosition += 1;
+        if (source[readPosition + 1] === '=') {
+          if (source[readPosition + 2] === '=') {
+            tokens.push({ type: 'EqualEqualEqual' });
+            readPosition += 3;
+          } else {
+            tokens.push({ type: 'EqualEqual' });
+            readPosition += 2;
+          }
+        } else {
+          tokens.push({ type: 'Equal' });
+          readPosition += 1;
+        }
+        break;
+      case '<':
+        if (source[readPosition + 1] === '=') {
+          tokens.push({ type: 'LEqual' });
+          readPosition += 2;
+        } else {
+          tokens.push({ type: 'LThan' });
+          readPosition += 1;
+        }
+        break;
+      case '!':
+        if (source[readPosition + 1] === '=') {
+          if (source[readPosition + 2] === '=') {
+            tokens.push({ type: 'NotEqualEqual' });
+            readPosition += 3;
+          } else {
+            tokens.push({ type: 'NotEqual' });
+            readPosition += 2;
+          }
+        } else {
+          tokens.push({ type: 'Not' });
+          readPosition += 1;
+        }
         break;
       case '(':
         tokens.push({ type: 'LParen' });
