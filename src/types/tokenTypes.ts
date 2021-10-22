@@ -1,6 +1,7 @@
 type Parens = 'LParen' | 'RParen'
 type Braces = 'LBrace' | 'RBrace'
-type Symbols = 'Asterisk'| 'Slash' | 'Equal' | 'Plus' | 'Minus' | Parens | Braces | 'Comma' | 'Semicolon'
+type CompareSymbol = 'LEqual' | 'LThan' | 'GEqual' | 'GThan' | 'EqualEqual' | 'NotEqual'
+type Symbols = CompareSymbol | 'Asterisk'| 'Slash' | 'Equal' | 'Plus' | 'Minus' | Parens | Braces | 'Comma' | 'Semicolon' | 'Not'
 type SymbolToken = { type: Symbols }
 type UnknownCharacterToken = {
     type: 'UnknownCharacter',
