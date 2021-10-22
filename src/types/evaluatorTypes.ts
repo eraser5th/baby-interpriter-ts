@@ -7,7 +7,9 @@ import {
   Assignment,
   DefineFunction, IfStatement, Source, Statement,
 } from './statementTypes';
-import { AddSubMulDiv, Expression, FuncCall } from './expressionTypes';
+import {
+  AddSubMulDiv, Expression, FuncCall, UnaryOperator,
+} from './expressionTypes';
 
 //* **************************************
 export type EvaluatorErrorResult = {
@@ -183,6 +185,15 @@ export type EvaluateIfStatement = (
 
 export type EvaluateAdd = (
     ast: AddSubMulDiv,
+    environment: Environment
+) => {
+    result: IntValue,
+    isError: false,
+    environment: Environment
+} | ErrorResponse
+
+export type EvaluateUnaryOperator = (
+    ast: UnaryOperator,
     environment: Environment
 ) => {
     result: IntValue,

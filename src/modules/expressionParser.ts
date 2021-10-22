@@ -12,6 +12,7 @@ import {
   ParseAddSubExpression,
   ParseExpression,
   ParseCommaSeparatedExpressions,
+  ParseUnaryOperator,
 } from '../types/expressionTypes';
 
 const InvalidExpression = () => ({
@@ -72,9 +73,34 @@ const parseValue: ParseValue = (tokens) => {
   return parseLiteral(tokens);
 };
 
+const parseUnaryOperator: ParseUnaryOperator = (tokens) => {
+  if (tokens[0]?.type !== 'Plus' && tokens[0]?.type !== 'Minus') {
+    return parseValue(tokens);
+  }
+  const { expression, parsedTokensCount } = parseExpression(tokens.slice(1));
+  if (!expression || !parsedTokensCount) return InvalidExpression();
+
+  if (tokens[0]?.type === 'Plus') {
+    return {
+      expression: {
+        type: 'UnaryPlus',
+        expression,
+      },
+      parsedTokensCount: parsedTokensCount + 1,
+    };
+  }
+  return {
+    expression: {
+      type: 'UnaryMinus',
+      expression,
+    },
+    parsedTokensCount: parsedTokensCount + 1,
+  };
+};
+
 // 括弧も含んで処理
 const parseParenthesisExpression: ParseParenthesisExpression = (tokens) => {
-  if (tokens[0]?.type !== 'LParen') return parseValue(tokens);
+  if (tokens[0]?.type !== 'LParen') return parseUnaryOperator(tokens);
 
   const { expression, parsedTokensCount } = parseExpression(tokens.slice(1));
 
@@ -113,25 +139,6 @@ const parseCommaSeparatedExpressions: ParseCommaSeparatedExpressions = (tokens) 
     parsedTokensCount: readPosition,
   };
 };
-
-/*
-function parseUnaryOperator(tokens) {
-  if (tokens[0]?.type === 'Plus' || tokens[0]?.type === 'Minus') {
-    const { expression: left, parsedTokensCount } = parseUnaryOperator(tokens.slice(1));
-    if (left === null) {
-      return { expression: null };
-    }
-    if (tokens[0].type === 'Plus') {
-      return { expression: { type: 'Mul', left }, parsedTokensCount: parsedTokensCount + 1 };
-    }
-    return {
-      type: 'UnaryMinus',
-      value: expression,
-    };
-  }
-  return parseExpression(tokens);
-}
-*/
 
 const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
   if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'LParen') {
