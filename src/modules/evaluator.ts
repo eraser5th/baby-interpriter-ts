@@ -87,6 +87,7 @@ const evaluatePartsOfSource: EvaluatePartsOfSource = (partsOfSource, environment
   };
 };
 
+/*
 const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
   const { condition, statements } = ast;
   const evalResult = evaluate(condition, initialEnvironment);
@@ -101,6 +102,19 @@ const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
     };
   }
   return evaluatePartsOfSource(statements, halfwayEnvironment);
+};
+*/
+
+const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
+  const { condition, ifStatements, elseStatements } = ast;
+  const evalResult = evaluate(condition, initialEnvironment);
+  if (evalResult.isError) return evalResult;
+
+  const { result, environment: halfwayEnvironment } = evalResult;
+  if ((result.type === 'BoolValue' && result.value === false) || result.type === 'NullValue') {
+    return evaluatePartsOfSource(elseStatements, halfwayEnvironment);
+  }
+  return evaluatePartsOfSource(ifStatements, halfwayEnvironment);
 };
 
 const evaluateAdd: EvaluateAdd = (ast, environment) => {

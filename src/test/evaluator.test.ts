@@ -388,9 +388,9 @@ const errorTests: TestCase[] = [
 
 const ifStatementTests: TestCase[] = [
   {
-    name: 'if true {1;};',
+    name: 'if true {1;}',
     input: {
-      source: lexAndParse('if true {1;};'),
+      source: lexAndParse('if true {1;}'),
       environment: {
         variables: new Map(),
         functions: new Map(),
@@ -406,9 +406,9 @@ const ifStatementTests: TestCase[] = [
     },
   },
   {
-    name: 'if false {1;};',
+    name: 'if false {1;}',
     input: {
-      source: lexAndParse('if false {1;};'),
+      source: lexAndParse('if false {1;}'),
       environment: {
         variables: new Map(),
         functions: new Map(),
@@ -424,9 +424,9 @@ const ifStatementTests: TestCase[] = [
     },
   },
   {
-    name: 'if 1 {2;};',
+    name: 'if 1 {2;}',
     input: {
-      source: lexAndParse('if 1 {2;};'),
+      source: lexAndParse('if 1 {2;}'),
       environment: {
         variables: new Map(),
         functions: new Map(),
@@ -442,9 +442,9 @@ const ifStatementTests: TestCase[] = [
     },
   },
   {
-    name: 'if 1 {2;3;};',
+    name: 'if 1 {2;3;}',
     input: {
-      source: lexAndParse('if 1 {2;3;};'),
+      source: lexAndParse('if 1 {2;3;}'),
       environment: {
         variables: new Map(),
         functions: new Map(),
@@ -460,9 +460,9 @@ const ifStatementTests: TestCase[] = [
     },
   },
   {
-    name: 'if null {2;3;};',
+    name: 'if null {2;3;}',
     input: {
-      source: lexAndParse('if null {2;3;};'),
+      source: lexAndParse('if null {2;3;}'),
       environment: {
         variables: new Map(),
         functions: new Map(),
@@ -470,6 +470,78 @@ const ifStatementTests: TestCase[] = [
     },
     output: {
       result: { type: 'NullValue', value: null },
+      isError: false,
+      environment: {
+        variables: new Map(),
+        functions: new Map(),
+      },
+    },
+  },
+  {
+    name: 'if false {1;} else {2;}',
+    input: {
+      source: lexAndParse('if false {1;} else {2;}'),
+      environment: {
+        variables: new Map(),
+        functions: new Map(),
+      },
+    },
+    output: {
+      result: { type: 'IntValue', value: 2 },
+      isError: false,
+      environment: {
+        variables: new Map(),
+        functions: new Map(),
+      },
+    },
+  },
+  {
+    name: 'if false {1;} else {2;3;}',
+    input: {
+      source: lexAndParse('if false {1;} else {2;3;}'),
+      environment: {
+        variables: new Map(),
+        functions: new Map(),
+      },
+    },
+    output: {
+      result: { type: 'IntValue', value: 3 },
+      isError: false,
+      environment: {
+        variables: new Map(),
+        functions: new Map(),
+      },
+    },
+  },
+  {
+    name: 'if false {1;} else if false {2;} else {3;}',
+    input: {
+      source: lexAndParse('if false {1;} else if false {2;} else {3;}'),
+      environment: {
+        variables: new Map(),
+        functions: new Map(),
+      },
+    },
+    output: {
+      result: { type: 'IntValue', value: 3 },
+      isError: false,
+      environment: {
+        variables: new Map(),
+        functions: new Map(),
+      },
+    },
+  },
+  {
+    name: 'if true {if false {2;} else {3;}}',
+    input: {
+      source: lexAndParse('if true {if false {2;} else {3;}}'),
+      environment: {
+        variables: new Map(),
+        functions: new Map(),
+      },
+    },
+    output: {
+      result: { type: 'IntValue', value: 3 },
       isError: false,
       environment: {
         variables: new Map(),
