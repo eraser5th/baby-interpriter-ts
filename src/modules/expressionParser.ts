@@ -13,6 +13,8 @@ import {
   ParseExpression,
   ParseCommaSeparatedExpressions,
   ParseUnaryOperator,
+  ParseCompare,
+  ParseEqEqEq,
 } from '../types/expressionTypes';
 
 const InvalidExpression = () => ({
@@ -205,5 +207,57 @@ const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
   return { expression: left, parsedTokensCount: readPosition };
 };
 
-const parseExpression: ParseExpression = (tokens) => parseAddSubExpression(tokens);
+const parseCompare: ParseCompare = (tokens) => {
+  const firstExpression = parseAddSubExpression(tokens);
+  if (!firstExpression.expression) return InvalidExpression();
+
+  let { expression: left, parsedTokensCount: readPosition } = firstExpression;
+
+  let readToken = tokens[readPosition];
+  while (
+    readToken?.type === 'LEqual'
+    || readToken?.type === 'LThan'
+    || readToken?.type === 'EqualEqual'
+    || readToken?.type === 'NotEqual'
+  ) {
+    const nextExpression = parseAddSubExpression(tokens.slice(readPosition + 1));
+    if (!nextExpression.expression) return InvalidExpression();
+
+    const { expression: right, parsedTokensCount: rightTokensCount } = nextExpression;
+
+    const kindOfCompare: {[key: string]: '<='| '<' | '===' | '!=='} = {
+      LEqual: '<=', LThan: '<', EqualEqual: '===', NotEqual: '!==',
+    };
+    left = {
+      type: 'HighLevelCompare', kindOfCompare: kindOfCompare[readToken.type], left, right,
+    };
+    readPosition += rightTokensCount + 1;
+    readToken = tokens[readPosition];
+  }
+  return { expression: left, parsedTokensCount: readPosition };
+};
+
+const parseEqEqEq: ParseEqEqEq = (tokens) => {
+  const firstExpression = parseCompare(tokens);
+  if (!firstExpression.expression) return InvalidExpression();
+
+  let { expression: left, parsedTokensCount: readPosition } = firstExpression;
+  let readToken = tokens[readPosition];
+  while (readToken?.type === 'EqualEqualEqual' || readToken?.type === 'NotEqualEqual') {
+    const nextExpression = parseCompare(tokens.slice(readPosition + 1));
+    if (!nextExpression.expression) return InvalidExpression();
+
+    const { expression: right, parsedTokensCount: rightTokensCount } = nextExpression;
+    const kindOfCompare: {[key: string]:'===' | '!=='} = { EqualEqualEqual: '===', NotEqualEqual: '!==' };
+    left = {
+      type: 'LowLevelCompare', kindOfCompare: kindOfCompare[readToken.type], left, right,
+    };
+    readPosition += rightTokensCount + 1;
+    readToken = tokens[readPosition];
+  }
+  return { expression: left, parsedTokensCount: readPosition };
+};
+
+const parseExpression: ParseExpression = (tokens) => parseEqEqEq(tokens);
+
 export default parseExpression;
