@@ -36,7 +36,6 @@ const parseBlock: ParseBlock = (tokens) => {
   while (tokens[readPosition]?.type !== 'RBrace') {
     // 閉じ括弧がなかったので無効な文配列を返す
     if (!tokens[readPosition]) return InvalidStatements();
-
     // 文を取得
     const {
       statement: stmt,
@@ -47,7 +46,6 @@ const parseBlock: ParseBlock = (tokens) => {
     statements.push(stmt);
     readPosition += parsedTokensCount;
   }
-
   // 正常な文配列を返却
   return {
     statements,
@@ -179,11 +177,9 @@ const parseElseStatement: ParseElseStatement = (tokens) => {
 const parseAssignment: ParseAssignment = (tokens) => {
   // 代入文でない
   if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'Equal') return InvalidAssignment();
-
   // 代入する値、式を取得
   const { expression, parsedTokensCount } = parseExpression(tokens.slice(2));
   if (!expression || !parsedTokensCount) return InvalidAssignment();
-
   // 正常な代入文を返却
   return {
     assignment: {
@@ -257,21 +253,18 @@ const parseDefineFunction: ParseDefineFunction = (tokens) => {
   if (tokens[0]?.type !== 'Def' || tokens[1]?.type !== 'Ident' || tokens[2]?.type !== 'LParen') {
     return InvalidDefineFunction();
   }
-
   // 仮引数を取得
   const {
     names: args,
     parsedTokensCount: parsedArgumentTokensCount,
   } = parseCommaSeparatedIdentifiers(tokens.slice(3));
   if (tokens[parsedArgumentTokensCount + 3]?.type !== 'RParen') return InvalidDefineFunction();
-
   // 実行部分を取得
   const {
     statements,
     parsedTokensCount: parsedBlockTokensCount,
   } = parseBlock(tokens.slice(parsedArgumentTokensCount + 4));
   if (!statements || !parsedBlockTokensCount) return InvalidDefineFunction();
-
   // 正常な関数宣言を返却
   return {
     defineFunction: {
@@ -298,7 +291,6 @@ const parseSource: ParseSource = (tokens) => {
       readPosition += parsedExpressionTokensCount;
       continue;
     }
-
     // 関数宣言を取得
     const {
       defineFunction,
@@ -309,7 +301,6 @@ const parseSource: ParseSource = (tokens) => {
       readPosition += parsedDefineFunctionTokensCount;
       continue;
     }
-
     // どちらでもないので、SyntaxErrorを返却
     return {
       type: 'SyntaxError',
@@ -317,7 +308,6 @@ const parseSource: ParseSource = (tokens) => {
       headToken: tokens[readPosition],
     };
   }
-
   // 正常なソースを返却
   return {
     type: 'Source',
