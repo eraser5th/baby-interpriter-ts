@@ -158,7 +158,6 @@ const parseElseStatement: ParseElseStatement = (tokens) => {
     statements,
     parsedTokensCount: blockTokensCount,
   } = parseBlock(tokens.slice(1));
-  console.log(statements);
   if (!statements || !blockTokensCount) {
     return {
       elseStatement: null,
