@@ -3,19 +3,9 @@
 import {
   BoolValue, Environment, IntValue, NullValue,
 } from './valueTypes';
+import { DefineFunction, Source, Statement } from './statementTypes';
 import {
-  Assignment,
-  DefineFunction, IfStatement, Source, Statement,
-} from './statementTypes';
-import {
-  AddSubMulDiv,
-  AndOperation,
-  Expression,
-  FuncCall,
-  HighLevelCompare,
-  LowLevelCompare,
-  OrOperation,
-  UnaryOperator,
+  Expression, FuncCall, HighLevelCompare, LowLevelCompare,
 } from './expressionTypes';
 
 export type EachErrorResponse<resultType> = {
@@ -76,63 +66,8 @@ export type ValueResponse<T> = {
     isError: false
 }
 //* **************************************
-export type UnwrapObject = (
-    obj: IntValue | BoolValue | NullValue
-) => null | number | boolean
-
-export type WrapObject = (
-    obj: any
-) => IntValue | BoolValue | NullValue
-//* **************************************
 
 //* **************************************
-
-export type EvaluateArguments = ( // 完了？
-    args: Expression[],
-    environment: Environment
-) => {
-    evaluatedArguments: (NullValue | IntValue | BoolValue)[],
-    isError: false,
-    environment: Environment
-} | ErrorResponse
-
-export type EmbeddedFunction = {
-    type: 'EmbeddedFunction',
-    function: Function,
-    argumentsCount: number
-}
-
-export type DefinedFunction = {
-    type: 'DefinedFunction',
-    statements: (Statement | DefineFunction)[],
-    arguments: string[],
-    argumentsCount: number
-}
-
-export type Func = EmbeddedFunction | DefinedFunction
-
-export type EvaluateEmbeddedFunction = (
-    func: EmbeddedFunction,
-    args: (IntValue | BoolValue | NullValue)[]
-) => NullValue | IntValue | BoolValue
-
-export type EvaluateDefinedFunction = (
-    func: DefinedFunction,
-    args: (IntValue | BoolValue | NullValue)[],
-    env: Environment
-) => ValueResponse<BoolValue | IntValue | NullValue> | ErrorResponse
-
-export type ComputeFunction = (
-    func: Func,
-    name: string,
-    args: (IntValue | BoolValue | NullValue)[],
-    env: Environment
-) => ValueResponse<BoolValue | IntValue | NullValue> | ErrorResponse
-
-export type EvaluateFunctionCalling = (
-    calling: FuncCall,
-    environment: Environment
-) => ValueResponse<BoolValue | IntValue | NullValue> | ErrorResponse
 
 export type EvaluateFunctionDefinition = (
     funcDef: DefineFunction,
@@ -140,34 +75,15 @@ export type EvaluateFunctionDefinition = (
 ) => ValueResponse<NullValue>
 //* **************************************
 
+export type EvaluateFunctionCalling = (
+    calling: FuncCall,
+    environment: Environment
+) => ValueResponse<BoolValue | IntValue | NullValue> | ErrorResponse
+
 export type EvaluatePartsOfSource = (
     statements: (Statement | DefineFunction)[],
     environment: Environment
 ) => ValueResponse<BoolValue | IntValue | NullValue> | ErrorResponse
-
-type CompareResult = {
-    type: 'CompareResult',
-    boolValue: boolean,
-    value: number | boolean | null
-}
-
-export type ComputeHighLevelCompare =(
-    ast: HighLevelCompare,
-    environment: Environment
-) => {
-    result: CompareResult,
-    environment: Environment,
-    isError: false
-} | ErrorResponse
-
-export type ComputeLowLevelCompare = (
-    ast: LowLevelCompare,
-    environment: Environment
-) => {
-    result: CompareResult,
-    environment: Environment,
-    isError: false
-} | ErrorResponse
 
 type DummyAst = {type: 'DummyAst'}
 
