@@ -2,12 +2,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-use-before-define */
 import { Tokens } from './tokenTypes';
-import { Environment } from './valueTypes';
 
 type IntLiteral = { type: 'IntLiteral', value: number }
 type BoolLiteral = { type: 'BoolLiteral', value: boolean }
 type NullLiteral = { type: 'NullLiteral' }
-
 export type Literal = IntLiteral | BoolLiteral | NullLiteral
 
 export type Variable = {
@@ -21,36 +19,19 @@ export type FuncCall = {
     arguments: Expression[]
 }
 
-type InfixOperator = 'Sub' | 'Add' | 'Mul' | 'Div'
-
-export type AddSubMulDiv = {
-    type: InfixOperator,
-    left: Expression
-    right: Expression
-}
-
-export type OrOperation = {
-    type: 'OrOperation',
+type InfixOperation<T> = {
+    type: T,
     left: Expression,
     right: Expression
 }
-export type AndOperation = {
-    type: 'AndOperation',
-    left: Expression,
-    right: Expression
-}
+
+export type AddSubMulDiv = InfixOperation<'Sub' | 'Add' | 'Mul' | 'Div'>
+
+export type OrOperation = InfixOperation<'OrOperation'>
+
+export type AndOperation = InfixOperation<'AndOperation'>
 
 export type LogicalOperation = OrOperation | AndOperation
-
-export type ParseOrExpression = (tokens: Tokens) => {
-    expression: Expression
-    parsedTokensCount: number
-} | InvalidExpression
-
-export type ParseAndExpression = (tokens: Tokens) => {
-    expression: Expression
-    parsedTokensCount: number
-} | InvalidExpression
 
 export type UnaryOperator = {
     type: 'UnaryPlus' | 'UnaryMinus' | 'UnaryNot',
@@ -74,11 +55,6 @@ export type Compare = HighLevelCompare | LowLevelCompare
 
 export type Expression = Literal | Variable | FuncCall | AddSubMulDiv | UnaryOperator | Compare | LogicalOperation
 
-export type ExpressionWithTokensCount = {
-    expression: Expression
-    parsedTokensCount: number
-}
-
 export type InvalidExpression = {
     expression: null,
     parsedTokensCount: undefined
@@ -89,45 +65,12 @@ export type InvalidArguments = {
     parsedTokensCount: undefined
 }
 
-export type ParseLiteral = (tokens: Tokens) => {
-    expression: Literal,
-    parsedTokensCount: 1
-} | InvalidExpression
-
-export type ParseValue = (tokens: Tokens) => {
-    expression: Literal | Variable
-    parsedTokensCount: 1
-} | InvalidExpression
-
-export type ParseParenthesisExpression = (tokens: Tokens) => ExpressionWithTokensCount | InvalidExpression
-
 export type ParseCommaSeparatedExpressions = (tokens: Tokens) => {
     args: (Expression | AddSubMulDiv | FuncCall | Literal | Variable)[],
     parsedTokensCount: number
 } | InvalidArguments
 
-export type ParseUnaryOperator = (tokens: Tokens) => {
-    expression: Expression,
-    parsedTokensCount: number
-} | {
-    expression: Literal | Variable;
-    parsedTokensCount: 1;
+export type ExpressionParser<expressionType, count extends number> = (tokens: Tokens) => {
+    expression: expressionType,
+    parsedTokensCount: count
 } | InvalidExpression
-
-export type ParseFunctionCallExpression = (tokens: Tokens) => ExpressionWithTokensCount | InvalidExpression
-
-export type ParseMulDivExpression = (tokens: Tokens) => ExpressionWithTokensCount | InvalidExpression
-
-export type ParseAddSubExpression = (tokens: Tokens) => ExpressionWithTokensCount | InvalidExpression
-
-export type ParseCompare = (tokens: Tokens) => {
-    expression: Expression,
-    parsedTokensCount: number,
-} | InvalidExpression
-
-export type ParseEqEqEq = (tokens: Tokens) => {
-    expression: Expression,
-    parsedTokensCount: number,
-} | InvalidExpression
-
-export type ParseExpression = (tokens: Tokens) => ExpressionWithTokensCount | InvalidExpression
