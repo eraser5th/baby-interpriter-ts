@@ -30,7 +30,7 @@ export type ParseIfStatement = (tokens: Tokens) => {
     parsedTokensCount: number
 } | InvalidIfStatement
 
-export type ElseStatement = {
+type ElseStatement = {
     type: 'Else',
     statements: Statement[]
 }
@@ -48,7 +48,7 @@ export type ParseElseStatement = (tokens: Tokens) => {
 export type Assignment = {
     type: 'Assignment',
     name: string,
-    expression: Expression | AddSubMulDiv | FuncCall | Literal | Variable
+    expression: Expression
 }
 
 type InvalidAssignment = {assignment: null, parsedTokensCount: undefined}

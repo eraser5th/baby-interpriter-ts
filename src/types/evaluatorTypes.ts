@@ -8,26 +8,26 @@ import {
   Expression, FuncCall, HighLevelCompare, LowLevelCompare,
 } from './expressionTypes';
 
-export type EachErrorResponse<resultType> = {
+//* **************************************
+type EachErrorResponse<resultType> = {
     result: resultType,
     environment: Environment,
     isError: true,
 }
 
-//* **************************************
-export type EvaluatorErrorResult = { type: 'EvaluatorError', message: string }
+type EvaluatorErrorResult = { type: 'EvaluatorError', message: string }
 
 export type EvaluatorErrorResponse = EachErrorResponse<EvaluatorErrorResult>
 
 export type EvaluatorError = (type: string, environment: Environment) => EvaluatorErrorResponse
-//* **************************************
-export type TypeErrorResult = { type: 'TypeError', message: string }
+
+type TypeErrorResult = { type: 'TypeError', message: string }
 
 export type TypeErrorResponse = EachErrorResponse<TypeErrorResult>
 
 export type TypeError = (type: string, environment: Environment) => TypeErrorResponse
-//* **************************************
-export type ArgumentsCountErrorResult = { type: 'ArgumentsCountError', message: string }
+
+type ArgumentsCountErrorResult = { type: 'ArgumentsCountError', message: string }
 
 export type ArgumentsCountErrorResponse = EachErrorResponse<ArgumentsCountErrorResult>
 
@@ -37,8 +37,8 @@ export type ArgumentsCountError = (
     got: number,
     environment: Environment
 ) => ArgumentsCountErrorResponse
-//* **************************************
-export type UndefinedFunctionErrorResult = { type: 'UndefinedFunctionError', message: string }
+
+type UndefinedFunctionErrorResult = { type: 'UndefinedFunctionError', message: string }
 
 export type UndefinedFunctionErrorResponse = EachErrorResponse<UndefinedFunctionErrorResult>
 
@@ -46,26 +46,25 @@ export type UndefinedFunctionError = (
     name: string,
     environment: Environment
 ) => UndefinedFunctionErrorResponse
-//* **************************************
-export type FunctionTypeErrorResult = { type: 'FunctionTypeError', message: string }
+
+type FunctionTypeErrorResult = { type: 'FunctionTypeError', message: string }
 
 export type FunctionTypeErrorResponse = EachErrorResponse<FunctionTypeErrorResult>
 
 export type FunctionTypeError = () => {}
-//* **************************************
 
 export type ErrorResponse = EvaluatorErrorResponse |
 TypeErrorResponse |
 FunctionTypeErrorResponse |
 UndefinedFunctionErrorResponse |
 ArgumentsCountErrorResponse
+//* **************************************
 
 export type ValueResponse<T> = {
     result: T,
     environment: Environment,
     isError: false
 }
-//* **************************************
 
 //* **************************************
 
@@ -73,7 +72,6 @@ export type EvaluateFunctionDefinition = (
     funcDef: DefineFunction,
     environment: Environment
 ) => ValueResponse<NullValue>
-//* **************************************
 
 export type EvaluateFunctionCalling = (
     calling: FuncCall,

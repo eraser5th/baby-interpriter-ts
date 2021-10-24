@@ -51,7 +51,7 @@ export type LowLevelCompare = {
     right: Expression
 }
 
-export type Compare = HighLevelCompare | LowLevelCompare
+type Compare = HighLevelCompare | LowLevelCompare
 
 export type Expression = Literal | Variable | FuncCall | AddSubMulDiv | UnaryOperator | Compare | LogicalOperation
 
