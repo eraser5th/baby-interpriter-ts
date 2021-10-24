@@ -43,6 +43,7 @@ literal = number
 ### parser パート
 
 #### expressioinParser パート
+
 - parseLiteral
 - parseValue
 - parseParenthesisExpression
@@ -54,6 +55,7 @@ literal = number
 - parseExpression
 
 #### statementParser パート
+
 - parseBlock
 - parseIfStatement
 - parseAssignment
@@ -61,3 +63,14 @@ literal = number
 - parseCommaSeparatedIdentifiers
 - parseDefineFunction
 - parseSource
+
+#### 式の優先度
+
+===,!== ->
+
+> =,>,==,!= ->
+> || ->
+> && ->
+> +,- ->
+> \*,/ ->
+> FuncCall,Unary(+,-,!),リテラル,変数
