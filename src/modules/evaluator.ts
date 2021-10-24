@@ -9,11 +9,7 @@ import {
 import {
   EvaluatorError,
   TypeError,
-  EvaluateIfStatement,
-  EvaluateAdd,
-  Evaluate,
   EvaluatePartsOfSource,
-  EvaluateAssignment,
   ArgumentsCountError,
   UndefinedFunctionError,
   UnwrapObject,
@@ -24,18 +20,20 @@ import {
   ComputeFunction,
   EvaluateFunctionCalling,
   EvaluateFunctionDefinition,
-  EvaluateUnaryOperator,
-  EvaluateLowLevelCompare,
   ComputeHighLevelCompare,
-  EvaluateHighLevelCompare,
   ComputeLowLevelCompare,
-  EvaluateAnd,
-  EvaluateOr,
   Func,
+  AstEvaluator,
 } from '../types/evaluatorTypes';
 import {
   BoolValue, IntValue, NullValue,
 } from '../types/valueTypes';
+import {
+  Assignment, DefineFunction, IfStatement, Source, Statement,
+} from '../types/statementTypes';
+import {
+  AddSubMulDiv, AndOperation, HighLevelCompare, LowLevelCompare, OrOperation, UnaryOperator,
+} from '../types/expressionTypes';
 
 const evaluatorError: EvaluatorError = (type, environment) => ({
   result: {
@@ -94,7 +92,9 @@ const evaluatePartsOfSource: EvaluatePartsOfSource = (partsOfSource, environment
   };
 };
 
-const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
+const evaluateIfStatement: AstEvaluator<
+  IfStatement, BoolValue | IntValue | NullValue
+> = (ast, initialEnvironment) => {
   const { condition, ifStatements, elseStatements } = ast;
   const evalResult = evaluate(condition, initialEnvironment);
   if (evalResult.isError) return evalResult;
@@ -106,7 +106,7 @@ const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
   return evaluatePartsOfSource(ifStatements, halfwayEnvironment);
 };
 
-const evaluateAdd: EvaluateAdd = (ast, environment) => {
+const evaluateAdd: AstEvaluator<AddSubMulDiv, IntValue> = (ast, environment) => {
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) {
     return leftEvalRes;
@@ -130,7 +130,7 @@ const evaluateAdd: EvaluateAdd = (ast, environment) => {
   };
 };
 
-const evaluateSub: EvaluateAdd = (ast, environment) => {
+const evaluateSub: AstEvaluator<AddSubMulDiv, IntValue> = (ast, environment) => {
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) {
     return leftEvalRes;
@@ -154,7 +154,7 @@ const evaluateSub: EvaluateAdd = (ast, environment) => {
   };
 };
 
-const evaluateMul: EvaluateAdd = (ast, environment) => {
+const evaluateMul: AstEvaluator<AddSubMulDiv, IntValue> = (ast, environment) => {
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) {
     return leftEvalRes;
@@ -178,7 +178,7 @@ const evaluateMul: EvaluateAdd = (ast, environment) => {
   };
 };
 
-const evaluateDiv: EvaluateAdd = (ast, environment) => {
+const evaluateDiv: AstEvaluator<AddSubMulDiv, IntValue> = (ast, environment) => {
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) {
     return leftEvalRes;
@@ -202,7 +202,9 @@ const evaluateDiv: EvaluateAdd = (ast, environment) => {
   };
 };
 
-const evaluateUnaryOperator: EvaluateUnaryOperator = (ast, environment) => {
+const evaluateUnaryOperator: AstEvaluator<
+  UnaryOperator, BoolValue | IntValue
+> = (ast, environment) => {
   const evalResult = evaluate(ast.expression, environment);
   if (evalResult.isError) {
     return evalResult;
@@ -258,7 +260,7 @@ const wrapObject: WrapObject = (obj) => {
   }
 };
 
-const evaluateAssignment: EvaluateAssignment = (ast, environment) => {
+const evaluateAssignment: AstEvaluator<Assignment, NullValue> = (ast, environment) => {
   const evalResult = evaluate(ast.expression, environment);
   if (evalResult.isError) return evalResult;
   return {
@@ -363,7 +365,9 @@ const evaluateFunctionDefinition: EvaluateFunctionDefinition = (funcDef, environ
   },
 });
 
-const evaluateAnd: EvaluateAnd = (ast, environment) => {
+const evaluateAnd: AstEvaluator<
+  AndOperation, BoolValue | IntValue | NullValue
+> = (ast, environment) => {
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) return leftEvalRes;
 
@@ -400,7 +404,9 @@ const evaluateAnd: EvaluateAnd = (ast, environment) => {
   };
 };
 
-const evaluateOr: EvaluateOr = (ast, environment) => {
+const evaluateOr: AstEvaluator<
+  OrOperation, BoolValue | IntValue | NullValue
+> = (ast, environment) => {
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) return leftEvalRes;
 
@@ -465,7 +471,7 @@ const computeHighLevelCompare: ComputeHighLevelCompare = (ast, environment) => {
   };
 };
 
-const evaluateHighLevelCompare: EvaluateHighLevelCompare = (ast, environment) => {
+const evaluateHighLevelCompare: AstEvaluator<HighLevelCompare, BoolValue> = (ast, environment) => {
   let leftEvalRes;
   if (ast.left.type === 'HighLevelCompare') {
     leftEvalRes = computeHighLevelCompare(ast.left, environment);
@@ -518,7 +524,7 @@ const computeLowLevelCompare: ComputeLowLevelCompare = (ast, environment) => {
   };
 };
 
-const evaluateLowLevelCompare: EvaluateLowLevelCompare = (ast, environment) => {
+const evaluateLowLevelCompare: AstEvaluator<LowLevelCompare, BoolValue> = (ast, environment) => {
   let leftEvalRes;
   if (ast.left.type === 'LowLevelCompare') {
     leftEvalRes = computeLowLevelCompare(ast.left, environment);
@@ -544,7 +550,12 @@ const evaluateLowLevelCompare: EvaluateLowLevelCompare = (ast, environment) => {
   };
 };
 
-const evaluate: Evaluate = (ast, environment) => {
+type DummyAst = {type: 'DummyAst'}
+
+const evaluate: AstEvaluator<
+  Statement | Source | DefineFunction | DummyAst,
+  BoolValue | IntValue | NullValue
+> = (ast, environment) => {
   switch (ast.type) {
     case 'Source':
       return evaluatePartsOfSource(ast.partsOfSource, environment);

@@ -70,7 +70,7 @@ FunctionTypeErrorResponse |
 UndefinedFunctionErrorResponse |
 ArgumentsCountErrorResponse
 
-type ValueResponse<T> = {
+export type ValueResponse<T> = {
     result: T,
     environment: Environment,
     isError: false
@@ -145,26 +145,6 @@ export type EvaluatePartsOfSource = (
     environment: Environment
 ) => ValueResponse<BoolValue | IntValue | NullValue> | ErrorResponse
 
-export type AstEvaluator<
-    astType extends Statement | Source | DefineFunction | DummyAst,
-    resultType extends BoolValue | IntValue | NullValue
-> = (
-    ast: astType,
-    environment: Environment
-) => ValueResponse<resultType> | ErrorResponse
-
-export type EvaluateIfStatement = AstEvaluator<IfStatement, BoolValue | IntValue | NullValue>
-
-export type EvaluateAdd = AstEvaluator<AddSubMulDiv, IntValue>
-
-export type EvaluateUnaryOperator = AstEvaluator<UnaryOperator, BoolValue | IntValue>
-
-export type EvaluateAssignment = AstEvaluator<Assignment, NullValue>
-
-export type EvaluateAnd = AstEvaluator<AndOperation, BoolValue | IntValue | NullValue>
-
-export type EvaluateOr = AstEvaluator<OrOperation, BoolValue | IntValue | NullValue>
-
 type CompareResult = {
     type: 'CompareResult',
     boolValue: boolean,
@@ -180,8 +160,6 @@ export type ComputeHighLevelCompare =(
     isError: false
 } | ErrorResponse
 
-export type EvaluateHighLevelCompare = AstEvaluator<HighLevelCompare, BoolValue>
-
 export type ComputeLowLevelCompare = (
     ast: LowLevelCompare,
     environment: Environment
@@ -191,11 +169,12 @@ export type ComputeLowLevelCompare = (
     isError: false
 } | ErrorResponse
 
-export type EvaluateLowLevelCompare = AstEvaluator<LowLevelCompare, BoolValue>
+type DummyAst = {type: 'DummyAst'}
 
-type DummyAst = {type: 'Dummy'}
-
-export type Evaluate = AstEvaluator<
-    Statement | Source | DefineFunction | DummyAst,
-    BoolValue | IntValue | NullValue
->
+export type AstEvaluator<
+    astType extends Statement | Source | DefineFunction | DummyAst,
+    resultType extends BoolValue | IntValue | NullValue
+> = (
+    ast: astType,
+    environment: Environment
+) => ValueResponse<resultType> | ErrorResponse
