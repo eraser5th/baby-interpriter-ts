@@ -24,7 +24,6 @@ import {
   ComputeFunction,
   EvaluateFunctionCalling,
   EvaluateFunctionDefinition,
-  Func,
   EvaluateUnaryOperator,
   EvaluateLowLevelCompare,
   ComputeHighLevelCompare,
@@ -32,6 +31,7 @@ import {
   ComputeLowLevelCompare,
   EvaluateAnd,
   EvaluateOr,
+  Func,
 } from '../types/evaluatorTypes';
 import {
   BoolValue, IntValue, NullValue,
@@ -94,24 +94,6 @@ const evaluatePartsOfSource: EvaluatePartsOfSource = (partsOfSource, environment
   };
 };
 
-/*
-const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
-  const { condition, statements } = ast;
-  const evalResult = evaluate(condition, initialEnvironment);
-  if (evalResult.isError) return evalResult;
-
-  const { result, environment: halfwayEnvironment } = evalResult;
-  if ((result.type === 'BoolValue' && result.value === false) || result.type === 'NullValue') {
-    return {
-      result: nullValue,
-      isError: false,
-      environment: halfwayEnvironment,
-    };
-  }
-  return evaluatePartsOfSource(statements, halfwayEnvironment);
-};
-*/
-
 const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
   const { condition, ifStatements, elseStatements } = ast;
   const evalResult = evaluate(condition, initialEnvironment);
@@ -125,7 +107,6 @@ const evaluateIfStatement: EvaluateIfStatement = (ast, initialEnvironment) => {
 };
 
 const evaluateAdd: EvaluateAdd = (ast, environment) => {
-  // 左の値を取得
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) {
     return leftEvalRes;
@@ -134,7 +115,6 @@ const evaluateAdd: EvaluateAdd = (ast, environment) => {
     return typeError(leftEvalRes.result.type, leftEvalRes.environment);
   }
 
-  // 右の値を取得
   const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
   if (rightEvalRes.isError) {
     return rightEvalRes;
@@ -143,7 +123,6 @@ const evaluateAdd: EvaluateAdd = (ast, environment) => {
     return typeError(rightEvalRes.result.type, environment);
   }
 
-  // 正常な結果を返却
   return {
     result: intValue(leftEvalRes.result.value + rightEvalRes.result.value),
     isError: false,
@@ -152,7 +131,6 @@ const evaluateAdd: EvaluateAdd = (ast, environment) => {
 };
 
 const evaluateSub: EvaluateAdd = (ast, environment) => {
-  // 左の値を取得
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) {
     return leftEvalRes;
@@ -161,7 +139,6 @@ const evaluateSub: EvaluateAdd = (ast, environment) => {
     return typeError(leftEvalRes.result.type, leftEvalRes.environment);
   }
 
-  // 右の値を取得
   const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
   if (rightEvalRes.isError) {
     return rightEvalRes;
@@ -170,7 +147,6 @@ const evaluateSub: EvaluateAdd = (ast, environment) => {
     return typeError(rightEvalRes.result.type, environment);
   }
 
-  // 正常な結果を返却
   return {
     result: intValue(leftEvalRes.result.value - rightEvalRes.result.value),
     isError: false,
@@ -179,7 +155,6 @@ const evaluateSub: EvaluateAdd = (ast, environment) => {
 };
 
 const evaluateMul: EvaluateAdd = (ast, environment) => {
-  // 左の値を取得
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) {
     return leftEvalRes;
@@ -187,7 +162,7 @@ const evaluateMul: EvaluateAdd = (ast, environment) => {
   if (leftEvalRes.result.type !== 'IntValue') {
     return typeError(leftEvalRes.result.type, leftEvalRes.environment);
   }
-  // 右の値を取得
+
   const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
   if (rightEvalRes.isError) {
     return rightEvalRes;
@@ -195,7 +170,7 @@ const evaluateMul: EvaluateAdd = (ast, environment) => {
   if (rightEvalRes.result.type !== 'IntValue') {
     return typeError(rightEvalRes.result.type, environment);
   }
-  // 正常な結果を返却
+
   return {
     result: intValue(leftEvalRes.result.value * rightEvalRes.result.value),
     isError: false,
@@ -204,7 +179,6 @@ const evaluateMul: EvaluateAdd = (ast, environment) => {
 };
 
 const evaluateDiv: EvaluateAdd = (ast, environment) => {
-  // 左の値を取得
   const leftEvalRes = evaluate(ast.left, environment);
   if (leftEvalRes.isError) {
     return leftEvalRes;
@@ -212,7 +186,7 @@ const evaluateDiv: EvaluateAdd = (ast, environment) => {
   if (leftEvalRes.result.type !== 'IntValue') {
     return typeError(leftEvalRes.result.type, leftEvalRes.environment);
   }
-  // 右の値を取得
+
   const rightEvalRes = evaluate(ast.right, leftEvalRes.environment);
   if (rightEvalRes.isError) {
     return rightEvalRes;
@@ -220,7 +194,7 @@ const evaluateDiv: EvaluateAdd = (ast, environment) => {
   if (rightEvalRes.result.type !== 'IntValue') {
     return typeError(rightEvalRes.result.type, environment);
   }
-  // 正常な結果を返却
+
   return {
     result: intValue(leftEvalRes.result.value / rightEvalRes.result.value),
     isError: false,
@@ -246,7 +220,6 @@ const evaluateUnaryOperator: EvaluateUnaryOperator = (ast, environment) => {
   if (evalResult.result.type !== 'IntValue') {
     return typeError(evalResult.result.type, environment);
   }
-
   if (ast.type === 'UnaryPlus') {
     return {
       result: intValue(evalResult.result.value),
