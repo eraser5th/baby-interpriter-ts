@@ -6,11 +6,8 @@ type Symbols = (
     'Asterisk'| 'Slash' | 'Equal' | 'Plus' | 'Minus' |'Comma' | 'Semicolon' |
     CompareSymbol | Parens | Braces |LogicOpeSymbol
 )
+
 type SymbolToken = { type: Symbols }
-type UnknownCharacterToken = {
-    type: 'UnknownCharacter',
-    value: string
-}
 type IdentToken = {
     type: 'Ident',
     name: string
@@ -23,10 +20,11 @@ type BoolToken = {
     type: 'Bool',
     value: boolean
 }
-type IfToken = { type: 'If' }
-type ElseToken = { type: 'Else' }
-type DefToken = { type: 'Def' }
-type NullToken = { type: 'Null' }
-type KeywordToken = BoolToken | IfToken| ElseToken | DefToken | NullToken
-export type Token = SymbolToken | UnknownCharacterToken | IdentToken | IntToken | KeywordToken
+type Keyword = 'If' | 'Else' | 'Def' | 'Null'
+type KeywordToken = BoolToken | { type: Keyword }
+type UnknownCharacterToken = {
+    type: 'UnknownCharacter',
+    value: string
+}
+export type Token = SymbolToken | IdentToken | IntToken | KeywordToken | UnknownCharacterToken
 export type Tokens = Token[]
