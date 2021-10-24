@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import parseExpression from '../modules/expressionParser';
 import lexicalAnalyse from '../modules/lexical-analyse';
-import { ExpressionWithTokensCount, InvalidExpression } from '../types/expressionTypes';
+import { Expression, InvalidExpression } from '../types/expressionTypes';
 import { Tokens } from '../types/tokenTypes';
 
 const CreateInvalidExpression = (): InvalidExpression => ({
@@ -12,7 +12,10 @@ const CreateInvalidExpression = (): InvalidExpression => ({
 type TestCase = {
     name: string,
     input: Tokens,
-    output: ExpressionWithTokensCount | InvalidExpression
+    output: {
+      expression: Expression,
+      parsedTokensCount: number
+    } | InvalidExpression
 }
 
 // これわかんない Expression Test しか思いつきませんでした...

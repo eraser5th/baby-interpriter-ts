@@ -4,19 +4,11 @@
 /* eslint-disable no-use-before-define */
 
 import {
-  ParseLiteral,
-  ParseValue,
-  ParseParenthesisExpression,
-  ParseFunctionCallExpression,
-  ParseMulDivExpression,
-  ParseAddSubExpression,
-  ParseExpression,
   ParseCommaSeparatedExpressions,
-  ParseUnaryOperator,
-  ParseCompare,
-  ParseEqEqEq,
-  ParseOrExpression,
-  ParseAndExpression,
+  ExpressionParser,
+  Expression,
+  Literal,
+  Variable,
 } from '../types/expressionTypes';
 
 const InvalidExpression = () => ({
@@ -29,7 +21,7 @@ const InvalidArguments = () => ({
   parsedTokensCount: undefined,
 });
 
-const parseLiteral: ParseLiteral = (tokens) => {
+const parseLiteral: ExpressionParser<Literal, 1> = (tokens) => {
   if (tokens.length === 0) {
     return InvalidExpression();
   }
@@ -63,7 +55,7 @@ const parseLiteral: ParseLiteral = (tokens) => {
   }
 };
 
-const parseValue: ParseValue = (tokens) => {
+const parseValue: ExpressionParser<Literal | Variable, 1> = (tokens) => {
   const head = tokens[0];
   if (head?.type === 'Ident') {
     return {
@@ -77,7 +69,7 @@ const parseValue: ParseValue = (tokens) => {
   return parseLiteral(tokens);
 };
 
-const parseUnaryOperator: ParseUnaryOperator = (tokens) => {
+const parseUnaryOperator: ExpressionParser<Expression, number> = (tokens) => {
   if (tokens[0]?.type !== 'Plus' && tokens[0]?.type !== 'Minus' && tokens[0]?.type !== 'Not') {
     return parseValue(tokens);
   }
@@ -111,7 +103,7 @@ const parseUnaryOperator: ParseUnaryOperator = (tokens) => {
 };
 
 // 括弧も含んで処理
-const parseParenthesisExpression: ParseParenthesisExpression = (tokens) => {
+const parseParenthesisExpression: ExpressionParser<Expression, number> = (tokens) => {
   if (tokens[0]?.type !== 'LParen') return parseUnaryOperator(tokens);
 
   const { expression, parsedTokensCount } = parseExpression(tokens.slice(1));
@@ -152,7 +144,7 @@ const parseCommaSeparatedExpressions: ParseCommaSeparatedExpressions = (tokens) 
   };
 };
 
-const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
+const parseFunctionCallExpression: ExpressionParser<Expression, number> = (tokens) => {
   if (tokens[0]?.type !== 'Ident' || tokens[1]?.type !== 'LParen') {
     return parseParenthesisExpression(tokens);
   }
@@ -173,7 +165,7 @@ const parseFunctionCallExpression: ParseFunctionCallExpression = (tokens) => {
   };
 };
 
-const parseMulDivExpression: ParseMulDivExpression = (tokens) => {
+const parseMulDivExpression: ExpressionParser<Expression, number> = (tokens) => {
   const firstExpression = parseFunctionCallExpression(tokens);
   if (!firstExpression.expression) return InvalidExpression();
 
@@ -195,7 +187,7 @@ const parseMulDivExpression: ParseMulDivExpression = (tokens) => {
   return { expression: left, parsedTokensCount: readPosition };
 };
 
-const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
+const parseAddSubExpression: ExpressionParser<Expression, number> = (tokens) => {
   const firstExpression = parseMulDivExpression(tokens);
   if (!firstExpression.expression) return InvalidExpression();
 
@@ -217,7 +209,7 @@ const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
   return { expression: left, parsedTokensCount: readPosition };
 };
 
-const parseAndExpression: ParseAndExpression = (tokens) => {
+const parseAndExpression: ExpressionParser<Expression, number> = (tokens) => {
   let { expression: left, parsedTokensCount: readPosition } = parseAddSubExpression(tokens);
   if (!left || !readPosition) {
     return InvalidExpression();
@@ -234,7 +226,7 @@ const parseAndExpression: ParseAndExpression = (tokens) => {
   return { expression: left, parsedTokensCount: readPosition };
 };
 
-const parseOrExpression: ParseOrExpression = (tokens) => {
+const parseOrExpression: ExpressionParser<Expression, number> = (tokens) => {
   let { expression: left, parsedTokensCount: readPosition } = parseAndExpression(tokens);
   if (!left || !readPosition) {
     return InvalidExpression();
@@ -251,7 +243,7 @@ const parseOrExpression: ParseOrExpression = (tokens) => {
   return { expression: left, parsedTokensCount: readPosition };
 };
 
-const parseCompare: ParseCompare = (tokens) => {
+const parseCompare: ExpressionParser<Expression, number> = (tokens) => {
   const firstExpression = parseOrExpression(tokens);
   if (!firstExpression.expression) return InvalidExpression();
 
@@ -281,7 +273,7 @@ const parseCompare: ParseCompare = (tokens) => {
   return { expression: left, parsedTokensCount: readPosition };
 };
 
-const parseEqEqEq: ParseEqEqEq = (tokens) => {
+const parseEqEqEq: ExpressionParser<Expression, number> = (tokens) => {
   const firstExpression = parseCompare(tokens);
   if (!firstExpression.expression) return InvalidExpression();
 
@@ -302,6 +294,6 @@ const parseEqEqEq: ParseEqEqEq = (tokens) => {
   return { expression: left, parsedTokensCount: readPosition };
 };
 
-const parseExpression: ParseExpression = (tokens) => parseEqEqEq(tokens);
+const parseExpression: ExpressionParser<Expression, number> = (tokens) => parseEqEqEq(tokens);
 
 export default parseExpression;
