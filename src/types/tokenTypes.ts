@@ -1,7 +1,11 @@
 type Parens = 'LParen' | 'RParen'
 type Braces = 'LBrace' | 'RBrace'
+type LogicOpeSymbol = 'Not' | 'PipePipe' | 'AndAnd' | 'And' | 'Pipe'
 type CompareSymbol = 'LEqual' | 'LThan' | 'EqualEqual' | 'NotEqual' | 'EqualEqualEqual' | 'NotEqualEqual'
-type Symbols = CompareSymbol | 'Asterisk'| 'Slash' | 'Equal' | 'Plus' | 'Minus' | Parens | Braces | 'Comma' | 'Semicolon' | 'Not'
+type Symbols = (
+    'Asterisk'| 'Slash' | 'Equal' | 'Plus' | 'Minus' |'Comma' | 'Semicolon' |
+    CompareSymbol | Parens | Braces |LogicOpeSymbol
+)
 type SymbolToken = { type: Symbols }
 type UnknownCharacterToken = {
     type: 'UnknownCharacter',

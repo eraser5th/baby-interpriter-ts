@@ -8,7 +8,14 @@ import {
   DefineFunction, IfStatement, Source, Statement,
 } from './statementTypes';
 import {
-  AddSubMulDiv, Expression, FuncCall, HighLevelCompare, LowLevelCompare, UnaryOperator,
+  AddSubMulDiv,
+  AndOperation,
+  Expression,
+  FuncCall,
+  HighLevelCompare,
+  LowLevelCompare,
+  OrOperation,
+  UnaryOperator,
 } from './expressionTypes';
 
 //* **************************************
@@ -196,7 +203,7 @@ export type EvaluateUnaryOperator = (
     ast: UnaryOperator,
     environment: Environment
 ) => {
-    result: IntValue,
+    result: IntValue | BoolValue,
     isError: false,
     environment: Environment
 } | ErrorResponse
@@ -213,6 +220,24 @@ export type EvaluateAssignment = (
 type Dummy = {
     type: 'Dummy',
 }
+
+export type EvaluateAnd = (
+    ast: AndOperation,
+    environment: Environment
+) => {
+    result: BoolValue | IntValue | NullValue,
+    isError: false,
+    environment: Environment
+} | ErrorResponse
+
+export type EvaluateOr = (
+    ast: OrOperation,
+    environment: Environment
+) => {
+    result: BoolValue | IntValue | NullValue,
+    isError: false,
+    environment: Environment
+} | ErrorResponse
 
 export type ComputeHighLevelCompare = (
     ast: HighLevelCompare,

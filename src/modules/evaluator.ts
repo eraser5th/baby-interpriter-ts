@@ -30,6 +30,8 @@ import {
   ComputeHighLevelCompare,
   EvaluateHighLevelCompare,
   ComputeLowLevelCompare,
+  EvaluateAnd,
+  EvaluateOr,
 } from '../types/evaluatorTypes';
 import {
   BoolValue, IntValue, NullValue,
@@ -231,9 +233,20 @@ const evaluateUnaryOperator: EvaluateUnaryOperator = (ast, environment) => {
   if (evalResult.isError) {
     return evalResult;
   }
-  if (evalResult.result.type !== 'IntValue') {
-    return typeError(evalResult.result.type, evalResult.environment);
+  if (ast.type === 'UnaryNot') {
+    return {
+      result: {
+        type: 'BoolValue',
+        value: !evalResult.result.value,
+      },
+      isError: false,
+      environment: evalResult.environment,
+    };
   }
+  if (evalResult.result.type !== 'IntValue') {
+    return typeError(evalResult.result.type, environment);
+  }
+
   if (ast.type === 'UnaryPlus') {
     return {
       result: intValue(evalResult.result.value),
@@ -241,7 +254,6 @@ const evaluateUnaryOperator: EvaluateUnaryOperator = (ast, environment) => {
       environment: evalResult.environment,
     };
   }
-
   return {
     result: intValue(-evalResult.result.value),
     isError: false,
@@ -378,6 +390,80 @@ const evaluateFunctionDefinition: EvaluateFunctionDefinition = (funcDef, environ
   },
 });
 
+const evaluateAnd: EvaluateAnd = (ast, environment) => {
+  const leftEvalRes = evaluate(ast.left, environment);
+  if (leftEvalRes.isError) return leftEvalRes;
+
+  const rightEvalRes = evaluate(ast.right, environment);
+  if (rightEvalRes.isError) return rightEvalRes;
+
+  const value = leftEvalRes.result.value && rightEvalRes.result.value;
+  if (typeof value === 'number') {
+    return {
+      result: {
+        type: 'IntValue',
+        value,
+      },
+      isError: false,
+      environment,
+    };
+  } if (typeof value === 'boolean') {
+    return {
+      result: {
+        type: 'BoolValue',
+        value,
+      },
+      isError: false,
+      environment,
+    };
+  }
+  return {
+    result: {
+      type: 'NullValue',
+      value,
+    },
+    isError: false,
+    environment,
+  };
+};
+
+const evaluateOr: EvaluateOr = (ast, environment) => {
+  const leftEvalRes = evaluate(ast.left, environment);
+  if (leftEvalRes.isError) return leftEvalRes;
+
+  const rightEvalRes = evaluate(ast.right, environment);
+  if (rightEvalRes.isError) return rightEvalRes;
+
+  const value = leftEvalRes.result.value || rightEvalRes.result.value;
+  if (typeof value === 'number') {
+    return {
+      result: {
+        type: 'IntValue',
+        value,
+      },
+      isError: false,
+      environment,
+    };
+  } if (typeof value === 'boolean') {
+    return {
+      result: {
+        type: 'BoolValue',
+        value,
+      },
+      isError: false,
+      environment,
+    };
+  }
+  return {
+    result: {
+      type: 'NullValue',
+      value,
+    },
+    isError: false,
+    environment,
+  };
+};
+
 const computeHighLevelCompare: ComputeHighLevelCompare = (ast, environment) => {
   let leftEvalRes;
   if (ast.left.type === 'HighLevelCompare') {
@@ -505,7 +591,12 @@ const evaluate: Evaluate = (ast, environment) => {
       return evaluateDiv(ast, environment);
     case 'UnaryMinus':
     case 'UnaryPlus':
+    case 'UnaryNot':
       return evaluateUnaryOperator(ast, environment);
+    case 'AndOperation':
+      return evaluateAnd(ast, environment);
+    case 'OrOperation':
+      return evaluateOr(ast, environment);
     case 'HighLevelCompare':
       return evaluateHighLevelCompare(ast, environment);
     case 'LowLevelCompare':

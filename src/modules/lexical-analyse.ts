@@ -90,6 +90,24 @@ const lexicalAnalyse = (source: string): Tokens => {
           readPosition += 1;
         }
         break;
+      case '|':
+        if (source[readPosition + 1] === '|') {
+          tokens.push({ type: 'PipePipe' });
+          readPosition += 2;
+        } else {
+          tokens.push({ type: 'Pipe' });
+          readPosition += 1;
+        }
+        break;
+      case '&':
+        if (source[readPosition + 1] === '&') {
+          tokens.push({ type: 'AndAnd' });
+          readPosition += 2;
+        } else {
+          tokens.push({ type: 'And' });
+          readPosition += 1;
+        }
+        break;
       case '(':
         tokens.push({ type: 'LParen' });
         readPosition += 1;

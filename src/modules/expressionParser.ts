@@ -15,6 +15,8 @@ import {
   ParseUnaryOperator,
   ParseCompare,
   ParseEqEqEq,
+  ParseOrExpression,
+  ParseAndExpression,
 } from '../types/expressionTypes';
 
 const InvalidExpression = () => ({
@@ -76,7 +78,7 @@ const parseValue: ParseValue = (tokens) => {
 };
 
 const parseUnaryOperator: ParseUnaryOperator = (tokens) => {
-  if (tokens[0]?.type !== 'Plus' && tokens[0]?.type !== 'Minus') {
+  if (tokens[0]?.type !== 'Plus' && tokens[0]?.type !== 'Minus' && tokens[0]?.type !== 'Not') {
     return parseValue(tokens);
   }
   const { expression, parsedTokensCount } = parseExpression(tokens.slice(1));
@@ -90,10 +92,18 @@ const parseUnaryOperator: ParseUnaryOperator = (tokens) => {
       },
       parsedTokensCount: parsedTokensCount + 1,
     };
+  } if (tokens[0]?.type === 'Minus') {
+    return {
+      expression: {
+        type: 'UnaryMinus',
+        expression,
+      },
+      parsedTokensCount: parsedTokensCount + 1,
+    };
   }
   return {
     expression: {
-      type: 'UnaryMinus',
+      type: 'UnaryNot',
       expression,
     },
     parsedTokensCount: parsedTokensCount + 1,
@@ -207,8 +217,42 @@ const parseAddSubExpression: ParseAddSubExpression = (tokens) => {
   return { expression: left, parsedTokensCount: readPosition };
 };
 
+const parseAndExpression: ParseAndExpression = (tokens) => {
+  let { expression: left, parsedTokensCount: readPosition } = parseAddSubExpression(tokens);
+  if (!left || !readPosition) {
+    return InvalidExpression();
+  }
+
+  while (tokens[readPosition]?.type === 'AndAnd') {
+    const { expression: right, parsedTokensCount } = parseAndExpression(tokens.slice(readPosition + 1));
+    if (!right || !parsedTokensCount) return InvalidExpression();
+    left = {
+      type: 'AndOperation', left, right,
+    };
+    readPosition += parsedTokensCount + 1;
+  }
+  return { expression: left, parsedTokensCount: readPosition };
+};
+
+const parseOrExpression: ParseOrExpression = (tokens) => {
+  let { expression: left, parsedTokensCount: readPosition } = parseAndExpression(tokens);
+  if (!left || !readPosition) {
+    return InvalidExpression();
+  }
+
+  while (tokens[readPosition]?.type === 'PipePipe') {
+    const { expression: right, parsedTokensCount } = parseAndExpression(tokens.slice(readPosition + 1));
+    if (!right || !parsedTokensCount) return InvalidExpression();
+    left = {
+      type: 'OrOperation', left, right,
+    };
+    readPosition += parsedTokensCount + 1;
+  }
+  return { expression: left, parsedTokensCount: readPosition };
+};
+
 const parseCompare: ParseCompare = (tokens) => {
-  const firstExpression = parseAddSubExpression(tokens);
+  const firstExpression = parseOrExpression(tokens);
   if (!firstExpression.expression) return InvalidExpression();
 
   let { expression: left, parsedTokensCount: readPosition } = firstExpression;

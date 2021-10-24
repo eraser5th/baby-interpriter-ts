@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-use-before-define */
 import { Tokens } from './tokenTypes';
+import { Environment } from './valueTypes';
 
 type IntLiteral = { type: 'IntLiteral', value: number }
 type BoolLiteral = { type: 'BoolLiteral', value: boolean }
@@ -28,8 +29,31 @@ export type AddSubMulDiv = {
     right: Expression
 }
 
+export type OrOperation = {
+    type: 'OrOperation',
+    left: Expression,
+    right: Expression
+}
+export type AndOperation = {
+    type: 'AndOperation',
+    left: Expression,
+    right: Expression
+}
+
+export type LogicalOperation = OrOperation | AndOperation
+
+export type ParseOrExpression = (tokens: Tokens) => {
+    expression: Expression
+    parsedTokensCount: number
+} | InvalidExpression
+
+export type ParseAndExpression = (tokens: Tokens) => {
+    expression: Expression
+    parsedTokensCount: number
+} | InvalidExpression
+
 export type UnaryOperator = {
-    type: 'UnaryPlus' | 'UnaryMinus',
+    type: 'UnaryPlus' | 'UnaryMinus' | 'UnaryNot',
     expression: Expression
 }
 
@@ -48,7 +72,7 @@ export type LowLevelCompare = {
 
 export type Compare = HighLevelCompare | LowLevelCompare
 
-export type Expression = Literal | Variable | FuncCall | AddSubMulDiv | UnaryOperator | Compare
+export type Expression = Literal | Variable | FuncCall | AddSubMulDiv | UnaryOperator | Compare | LogicalOperation
 
 export type ExpressionWithTokensCount = {
     expression: Expression
