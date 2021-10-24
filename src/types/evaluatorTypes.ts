@@ -4,9 +4,7 @@ import {
   BoolValue, Environment, IntValue, NullValue,
 } from './valueTypes';
 import { DefineFunction, Source, Statement } from './statementTypes';
-import {
-  Expression, FuncCall, HighLevelCompare, LowLevelCompare,
-} from './expressionTypes';
+import { FuncCall } from './expressionTypes';
 
 //* **************************************
 type EachErrorResponse<resultType> = {
@@ -59,13 +57,11 @@ FunctionTypeErrorResponse |
 UndefinedFunctionErrorResponse |
 ArgumentsCountErrorResponse
 //* **************************************
-
-export type ValueResponse<T> = {
-    result: T,
+export type ValueResponse<resultType extends (NullValue | IntValue | BoolValue)> = {
+    result: resultType,
     environment: Environment,
     isError: false
 }
-
 //* **************************************
 
 export type EvaluateFunctionDefinition = (

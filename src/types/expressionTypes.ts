@@ -19,7 +19,7 @@ export type FuncCall = {
     arguments: Expression[]
 }
 
-type InfixOperation<T> = {
+type InfixOperation<T extends string> = {
     type: T,
     left: Expression,
     right: Expression
@@ -70,7 +70,7 @@ export type ParseCommaSeparatedExpressions = (tokens: Tokens) => {
     parsedTokensCount: number
 } | InvalidArguments
 
-export type ExpressionParser<expressionType, count extends number> = (tokens: Tokens) => {
+export type ExpressionParser<expressionType extends Expression, count extends number> = (tokens: Tokens) => {
     expression: expressionType,
     parsedTokensCount: count
 } | InvalidExpression
