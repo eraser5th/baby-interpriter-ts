@@ -165,6 +165,12 @@ const lexicalAnalyse = (source: string): Tokens => {
             case 'null':
               tokens.push({ type: 'Null' });
               break;
+            case 'for':
+              tokens.push({ type: 'for' });
+              break;
+            case 'while':
+              tokens.push({ type: 'while' });
+              break;
             default:
               tokens.push({ type: 'Ident', name });
           }

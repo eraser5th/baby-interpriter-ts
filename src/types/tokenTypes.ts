@@ -20,7 +20,7 @@ type BoolToken = {
     type: 'Bool',
     value: boolean
 }
-type Keyword = 'If' | 'Else' | 'Def' | 'Null'
+type Keyword = 'If' | 'Else' | 'Def' | 'Null' | 'for' | 'while'
 type KeywordToken = BoolToken | { type: Keyword }
 type UnknownCharacterToken = {
     type: 'UnknownCharacter',
