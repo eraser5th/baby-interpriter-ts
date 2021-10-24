@@ -5,7 +5,9 @@ import lexicalAnalyse from '../modules/lexical-analyse';
 import parseSource from '../modules/statementParser';
 import { Source } from '../types/statementTypes';
 import { nullValue } from '../modules/value';
-import { Environment } from '../types/valueTypes';
+import {
+  BoolValue, Environment, IntValue, NullValue,
+} from '../types/valueTypes';
 import { EvaluatorErrorResponse, TypeErrorResponse, ValueResponse } from '../types/evaluatorTypes';
 
 function lexAndParse(source: string) {
@@ -25,7 +27,9 @@ type TestCase = {
     source: Source,
     environment: Environment,
   }
-  output: ValueResponse | TypeErrorResponse | EvaluatorErrorResponse
+  output: ValueResponse<
+    IntValue | BoolValue | NullValue
+  > | TypeErrorResponse | EvaluatorErrorResponse
 }
 
 type EvaluatorTests = {
