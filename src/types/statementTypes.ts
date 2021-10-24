@@ -58,6 +58,21 @@ export type ParseAssignment = (tokens: Tokens) => {
     parsedTokensCount: number,
 } | InvalidAssignment
 
+type InvalidForStatement = {forStatement: null, parsedTokensCount: undefined}
+
+export type ForStatement = {
+    type: 'For',
+    initialization: Expression,
+    termination: Expression,
+    increment: Expression,
+    statements: Statement[]
+}
+
+export type ParseForStatement = (tokens: Tokens) => {
+    forStatement: ForStatement
+    parsedTokensCount: number
+} | InvalidForStatement
+
 export type ParseStatement = (tokens: Tokens) => StatementWithCount | InvalidStatement
 
 export type ParseCommaSeparatedIdentifiers = (tokens: Tokens) => {
@@ -68,7 +83,7 @@ export type ParseCommaSeparatedIdentifiers = (tokens: Tokens) => {
     parsedTokensCount: number,
 }
 
-export type Statement = IfStatement | Assignment | Expression
+export type Statement = IfStatement | Assignment | Expression | ForStatement
 
 export type StatementWithCount = {
     statement: Statement,

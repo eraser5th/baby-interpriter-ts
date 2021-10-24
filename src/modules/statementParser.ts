@@ -9,6 +9,7 @@ import {
   ParseCommaSeparatedIdentifiers,
   ParseDefineFunction,
   ParseElseStatement,
+  ParseForStatement,
   ParseIfStatement,
   ParseSource,
   ParseStatement,
@@ -22,6 +23,8 @@ const InvalidStatement = () => ({ statement: null, parsedTokensCount: undefined 
 const InvalidIfStatement = () => ({ ifStatement: null, parsedTokensCount: undefined });
 
 const InvalidAssignment = () => ({ assignment: null, parsedTokensCount: undefined });
+
+const InvalidForStatement = () => ({ forStatement: null, parsedTokensCount: undefined });
 
 const InvalidDefineFunction = () => ({ defineFunction: null, parsedTokensCount: undefined });
 
@@ -152,6 +155,49 @@ const parseAssignment: ParseAssignment = (tokens) => {
   };
 };
 
+const parseForStatement: ParseForStatement = (tokens) => {
+  if (tokens[0]?.type !== 'for' || tokens[1]?.type !== 'LParen') return InvalidForStatement();
+  let readPosition = 2;
+  const {
+    expression: initialization,
+    parsedTokensCount: initializeTokensCount,
+  } = parseExpression(tokens.slice(readPosition));
+  if (!initialization || !initializeTokensCount) return InvalidForStatement();
+  readPosition += initializeTokensCount + 1;
+
+  const {
+    expression: termination,
+    parsedTokensCount: terminationTokensCount,
+  } = parseExpression(tokens.slice(readPosition));
+  if (!termination || !terminationTokensCount) return InvalidForStatement();
+  readPosition += terminationTokensCount + 1;
+
+  const {
+    expression: increment,
+    parsedTokensCount: incrementParsedTokensCount,
+  } = parseExpression(tokens.slice(readPosition));
+  if (!increment || !incrementParsedTokensCount) return InvalidForStatement();
+  readPosition += incrementParsedTokensCount + 1;
+  if (tokens[readPosition]?.type !== 'RParen') return InvalidForStatement();
+  readPosition += 1;
+
+  const {
+    statements,
+    parsedTokensCount,
+  } = parseBlock(tokens.slice(readPosition));
+  if (!statements || !parsedTokensCount) return InvalidForStatement();
+  return {
+    forStatement: {
+      type: 'For',
+      initialization,
+      termination,
+      increment,
+      statements,
+    },
+    parsedTokensCount: readPosition + parsedTokensCount,
+  };
+};
+
 const parseStatement: ParseStatement = (tokens) => {
   const { expression, parsedTokensCount: parsedExpressionTokensCount } = parseExpression(tokens);
   if (parsedExpressionTokensCount && expression && tokens[parsedExpressionTokensCount]?.type === 'Semicolon') {
@@ -174,6 +220,14 @@ const parseStatement: ParseStatement = (tokens) => {
     return {
       statement: ifStatement,
       parsedTokensCount: parsedIfTokensCount,
+    };
+  }
+
+  const { forStatement, parsedTokensCount: parsedForTokensCount } = parseForStatement(tokens);
+  if (forStatement && parsedForTokensCount) {
+    return {
+      statement: forStatement,
+      parsedTokensCount: parsedForTokensCount,
     };
   }
 
