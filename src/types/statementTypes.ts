@@ -62,9 +62,9 @@ type InvalidForStatement = {forStatement: null, parsedTokensCount: undefined}
 
 export type ForStatement = {
     type: 'For',
-    initialization: Expression,
+    initialization: Statement,
     termination: Expression,
-    increment: Expression,
+    increment: Statement,
     statements: Statement[]
 }
 

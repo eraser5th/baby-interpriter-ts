@@ -159,9 +159,9 @@ const parseForStatement: ParseForStatement = (tokens) => {
   if (tokens[0]?.type !== 'for' || tokens[1]?.type !== 'LParen') return InvalidForStatement();
   let readPosition = 2;
   const {
-    expression: initialization,
+    statement: initialization,
     parsedTokensCount: initializeTokensCount,
-  } = parseExpression(tokens.slice(readPosition));
+  } = parseStatement(tokens.slice(readPosition));
   if (!initialization || !initializeTokensCount) return InvalidForStatement();
   readPosition += initializeTokensCount + 1;
 
@@ -173,9 +173,9 @@ const parseForStatement: ParseForStatement = (tokens) => {
   readPosition += terminationTokensCount + 1;
 
   const {
-    expression: increment,
+    statement: increment,
     parsedTokensCount: incrementParsedTokensCount,
-  } = parseExpression(tokens.slice(readPosition));
+  } = parseStatement(tokens.slice(readPosition));
   if (!increment || !incrementParsedTokensCount) return InvalidForStatement();
   readPosition += incrementParsedTokensCount + 1;
   if (tokens[readPosition]?.type !== 'RParen') return InvalidForStatement();
