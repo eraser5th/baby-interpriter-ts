@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import lexicalAnalyse from '../modules/lexical-analyse';
+import lexicalAnalyse from '../modules/lexical-analyze';
 import parseSource from '../modules/statementParser';
 import { Source, SyntaxError } from '../types/statementTypes';
 import { Tokens } from '../types/tokenTypes';

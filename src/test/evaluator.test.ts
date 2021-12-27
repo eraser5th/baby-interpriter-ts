@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 
 import evaluate from '../modules/evaluator';
-import lexicalAnalyse from '../modules/lexical-analyse';
+import lexicalAnalyse from '../modules/lexical-analyze';
 import parseSource from '../modules/statementParser';
 import { Source } from '../types/statementTypes';
 import { nullValue } from '../modules/value';

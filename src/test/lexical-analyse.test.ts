@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 
-import lexicalAnalyse from '../modules/lexical-analyse';
+import lexicalAnalyse from '../modules/lexical-analyze';
 import { Tokens } from '../types/tokenTypes';
 
 type TestCase = {

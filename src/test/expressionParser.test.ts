@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 import parseExpression from '../modules/expressionParser';
-import lexicalAnalyse from '../modules/lexical-analyse';
+import lexicalAnalyse from '../modules/lexical-analyze';
 import { Expression, InvalidExpression } from '../types/expressionTypes';
 import { Tokens } from '../types/tokenTypes';
 
