@@ -19,6 +19,7 @@ import evaluateAnd from './evaluators/evaluateAnd';
 import evaluateFunctionCalling from './evaluators/evaluateFunctionCalling';
 import evaluateAssignment from './evaluators/evaluateAssignment';
 import evaluateFunctionDefinition from './evaluators/evaluateFunctionDefinition';
+import evaluateForStatement from './evaluators/evaluateForStatement';
 
 type DummyAst = {type: 'DummyAst'}
 
@@ -35,6 +36,8 @@ const evaluate: AstEvaluator<
       return evaluateAssignment(ast, environment);
     case 'If':
       return evaluateIfStatement(ast, environment);
+    case 'For':
+      return evaluateForStatement(ast, environment);
     case 'Add':
       return evaluateAdd(ast, environment);
     case 'Sub':
