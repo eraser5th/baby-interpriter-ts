@@ -23,7 +23,7 @@ const isUnknownCharacter = (token: Token): boolean => token.type === 'UnknownCha
   let environment = emptyEnvironment;
   for (;;) {
     // eslint-disable-next-line no-await-in-loop
-    const tokens = lexicalAnalzse(await read());
+    const tokens = lexicalAnalyze(await read());
     const lexicalError = tokens.find(isUnknownCharacter);
     if (lexicalError) {
       console.error(lexicalError);
