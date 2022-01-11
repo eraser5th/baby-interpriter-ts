@@ -4,7 +4,7 @@
 import prompts from 'prompts';
 import { Token } from './types/tokenTypes';
 import { emptyEnvironment } from './modules/value';
-import lexicalAnalyse from './modules/lexical-analyse';
+import lexicalAnalyze from './modules/lexical-analyze';
 import parseSource from './modules/statementParser';
 import evaluate from './modules/evaluator';
 
@@ -23,7 +23,7 @@ const isUnknownCharacter = (token: Token): boolean => token.type === 'UnknownCha
   let environment = emptyEnvironment;
   for (;;) {
     // eslint-disable-next-line no-await-in-loop
-    const tokens = lexicalAnalyse(await read());
+    const tokens = lexicalAnalyze(await read());
     const lexicalError = tokens.find(isUnknownCharacter);
     if (lexicalError) {
       console.error(lexicalError);
