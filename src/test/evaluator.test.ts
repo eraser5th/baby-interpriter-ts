@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 
 import evaluate from '../modules/evaluator';
-import lexicalAnalyse from '../modules/lexical-analyze';
+import lexicalAnalyze from '../modules/lexical-analyze';
 import parseSource from '../modules/statementParser';
 import { Source } from '../types/statementTypes';
 import { nullValue } from '../modules/value';
@@ -11,7 +11,7 @@ import {
 import { EvaluatorErrorResponse, TypeErrorResponse, ValueResponse } from '../types/evaluatorTypes';
 
 function lexAndParse(source: string) {
-  return parseSource(lexicalAnalyse(source)) as Source;
+  return parseSource(lexicalAnalyze(source)) as Source;
 }
 
 function emptyEnvironment(): Environment {
