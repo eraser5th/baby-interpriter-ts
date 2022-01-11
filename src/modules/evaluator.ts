@@ -1,7 +1,6 @@
 /* eslint-disable no-use-before-define */
 
 import { boolValue, intValue, nullValue } from './value';
-
 import { AstEvaluator } from '../types/evaluatorTypes';
 import { BoolValue, IntValue, NullValue } from '../types/valueTypes';
 import { DefineFunction, Source, Statement } from '../types/statementTypes';
