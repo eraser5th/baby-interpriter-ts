@@ -18,5 +18,5 @@
         "import/no-unresolved": "off",
         "import/extensions": "off"
     },
-    "ignorePatterns": ["build/*"]
+    "ignorePatterns": ["build/*", "*.json"]
 }
