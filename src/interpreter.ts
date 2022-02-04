@@ -1,7 +1,6 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-console */
 
-
 import prompts from 'prompts';
 import { Token } from './types/tokenTypes';
 import { emptyEnvironment } from './modules/value';
